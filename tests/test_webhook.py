@@ -3,6 +3,8 @@ Test script to send a webhook payload to the API.
 """
 
 import json
+import asyncio
+import aiohttp
 import sys
 from datetime import datetime
 
@@ -920,10 +922,6 @@ payloads = {
     "9": payload9,
     "10": payload10,
 }
-
-
-import asyncio
-import aiohttp
 
 
 async def main():
