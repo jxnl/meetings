@@ -3,12 +3,26 @@ Service for handling meeting data operations.
 """
 
 from datetime import datetime
+import json
 from typing import List, Optional, Dict, Any
 
 from sqlalchemy.orm import Session
 
-from app.models.meeting import Meeting, Attendee, ActionItem, TranscriptEntry
-from app.schemas.meeting import MeetingCreate, WebhookPayload
+from app.models.meeting import (
+    Meeting,
+    Attendee,
+    ActionItem,
+    TranscriptEntry,
+    DenormalizedMeetingView,
+)
+from app.schemas.meeting import (
+    MeetingCreate,
+    WebhookPayload,
+    DenormalizedMeeting,
+    DenormalizedAttendee,
+    DenormalizedActionItem,
+    DenormalizedTranscriptEntry,
+)
 
 
 def create_meeting_from_webhook(db: Session, payload: WebhookPayload) -> Meeting:
@@ -44,17 +58,17 @@ def create_meeting_from_webhook(db: Session, payload: WebhookPayload) -> Meeting
             # Skip attendees without email
             if not attendee_data.email:
                 continue
-                
+
             # Find existing attendee by email or create a new one
-            existing_attendee = db.query(Attendee).filter(
-                Attendee.email == attendee_data.email
-            ).first()
-            
+            existing_attendee = (
+                db.query(Attendee).filter(Attendee.email == attendee_data.email).first()
+            )
+
             if existing_attendee:
                 # Update name if needed (use most recent name)
                 if existing_attendee.name != attendee_data.name:
                     existing_attendee.name = attendee_data.name
-                    
+
                 # Add meeting to existing attendee
                 existing_attendee.meetings.append(db_meeting)
             else:
@@ -65,7 +79,7 @@ def create_meeting_from_webhook(db: Session, payload: WebhookPayload) -> Meeting
                 )
                 db.add(new_attendee)
                 db.flush()  # Flush to get the attendee ID
-                
+
                 # Add meeting to new attendee
                 new_attendee.meetings.append(db_meeting)
 
@@ -208,40 +222,8 @@ def get_attendees_with_valid_emails(db: Session) -> List[Attendee]:
     Returns:
         List[Attendee]: List of attendee objects with email addresses
     """
-    # If we're in test mode and there are only generic domains, add some test domains
+    # Get all attendees with valid email addresses
     attendees = db.query(Attendee).filter(Attendee.email.isnot(None)).all()
-    
-    if all(attendee.email.split('@')[1] in ('example.com', 'gmail.com', 'hotmail.com') for attendee in attendees 
-           if attendee.email and '@' in attendee.email):
-        # Add some test company domains
-        test_domains = {
-            'acme.com': ['John Test', 'Sarah Test', 'Mike Test'],
-            'techcorp.io': ['Alex Developer', 'Maria Engineer', 'David Product'],
-            'consulting.org': ['Jennifer Consultant', 'Paul Advisor'],
-            'finance.co': ['Robert Finance', 'Lisa Accounting'],
-            'healthcare.med': ['Mark Doctor', 'Emily Nurse'],
-            'salesforce.com': ['Tom Sales', 'Jessica Marketing'],
-            'amazon.com': ['Jeff Bezos', 'Andy Product'],
-            'microsoft.com': ['Satya CEO', 'Bill Gates'],
-            'apple.com': ['Tim Cook', 'Craig Designer'],
-            'google.com': ['Sundar Pichai', 'Larry AI']
-        }
-        
-        # Create test attendees with company domains if they don't exist
-        for domain, names in test_domains.items():
-            for name in names:
-                email = f"{name.lower().replace(' ', '.')}@{domain}"
-                
-                # Check if attendee with this email already exists
-                existing = db.query(Attendee).filter(Attendee.email == email).first()
-                if not existing:
-                    new_attendee = Attendee(name=name, email=email)
-                    db.add(new_attendee)
-        
-        db.commit()
-        # Get the updated list
-        attendees = db.query(Attendee).filter(Attendee.email.isnot(None)).all()
-    
     return attendees
 
 
@@ -259,23 +241,203 @@ def get_attendee_stats(db: Session, attendee_id: int) -> Dict[str, Any]:
     attendee = db.query(Attendee).filter(Attendee.id == attendee_id).first()
     if not attendee:
         return {}
-    
+
     meetings_count = len(attendee.meetings)
-    
+
     # Get total meeting duration for this attendee
     total_duration = sum(meeting.duration or 0 for meeting in attendee.meetings)
-    
+
     # Get all unique co-attendees
     co_attendees = set()
     for meeting in attendee.meetings:
         for co_attendee in meeting.attendees:
             if co_attendee.id != attendee_id:
                 co_attendees.add(co_attendee.id)
-    
+
     return {
         "name": attendee.name,
         "email": attendee.email,
         "meetings_count": meetings_count,
-        "total_duration_hours": round(total_duration / 3600, 2) if total_duration else 0,
-        "unique_co_attendees": len(co_attendees)
+        "total_duration_hours": (
+            round(total_duration / 3600, 2) if total_duration else 0
+        ),
+        "unique_co_attendees": len(co_attendees),
     }
+
+
+def format_timestamp(seconds: float) -> str:
+    """
+    Format seconds as MM:SS for transcript timestamps.
+
+    Args:
+        seconds: Time in seconds
+
+    Returns:
+        String in MM:SS format
+    """
+    if seconds is None:
+        return "00:00"
+
+    minutes, secs = divmod(int(seconds), 60)
+    hours, minutes = divmod(minutes, 60)
+
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+    else:
+        return f"{minutes:02d}:{secs:02d}"
+
+
+def update_denormalized_meeting_view(db: Session, meeting_id: int) -> None:
+    """
+    Update the denormalized meeting view for a given meeting.
+    This pre-computes all the data needed for YAML export.
+
+    Args:
+        db: Database session
+        meeting_id: Meeting ID
+    """
+    # Get the meeting and all related data
+    meeting = db.query(Meeting).filter(Meeting.id == meeting_id).first()
+    if not meeting:
+        return
+
+    # Prepare the denormalized data
+    attendees_data = [
+        {"id": attendee.id, "name": attendee.name, "email": attendee.email}
+        for attendee in meeting.attendees
+    ]
+
+    action_items_data = [
+        {
+            "id": item.id,
+            "title": item.title,
+            "description": item.description,
+            "status": item.status,
+            "assignee_name": item.assignee_name,
+            "assignee_email": item.assignee_email,
+        }
+        for item in meeting.action_items
+    ]
+
+    # Sort transcript entries by timestamp
+    transcript_entries = sorted(meeting.transcript_entries, key=lambda x: x.timestamp)
+    transcript_data = [
+        {
+            "id": entry.id,
+            "speaker": entry.speaker,
+            "text": entry.text,
+            "timestamp": entry.timestamp,
+            "formatted_time": format_timestamp(entry.timestamp),
+        }
+        for entry in transcript_entries
+    ]
+
+    # Check if a denormalized view already exists
+    denorm_view = (
+        db.query(DenormalizedMeetingView)
+        .filter(DenormalizedMeetingView.id == meeting_id)
+        .first()
+    )
+
+    if denorm_view:
+        # Update existing view
+        denorm_view.name = meeting.name
+        denorm_view.created_at = meeting.created_at
+        denorm_view.duration = meeting.duration
+        denorm_view.url = meeting.url
+        denorm_view.recording_url = meeting.recording_url
+        denorm_view.notes = meeting.notes
+        denorm_view.external_id = meeting.external_id
+        denorm_view.received_at = meeting.received_at
+        denorm_view.attendees_data = attendees_data
+        denorm_view.action_items_data = action_items_data
+        denorm_view.transcript_data = transcript_data
+        denorm_view.last_updated = datetime.now()
+    else:
+        # Create new view
+        denorm_view = DenormalizedMeetingView(
+            id=meeting.id,
+            name=meeting.name,
+            created_at=meeting.created_at,
+            duration=meeting.duration,
+            url=meeting.url,
+            recording_url=meeting.recording_url,
+            notes=meeting.notes,
+            external_id=meeting.external_id,
+            received_at=meeting.received_at,
+            attendees_data=attendees_data,
+            action_items_data=action_items_data,
+            transcript_data=transcript_data,
+            last_updated=datetime.now(),
+        )
+        db.add(denorm_view)
+
+    # Commit changes
+    db.commit()
+
+
+def get_denormalized_meeting(
+    db: Session, meeting_id: int
+) -> Optional[DenormalizedMeeting]:
+    """
+    Get the denormalized meeting data for a given meeting as a Pydantic model.
+    If the denormalized view doesn't exist, it creates it.
+
+    Args:
+        db: Database session
+        meeting_id: Meeting ID
+
+    Returns:
+        DenormalizedMeeting: Pydantic model with denormalized meeting data
+    """
+    # Try to get from denormalized view
+    denorm_view = (
+        db.query(DenormalizedMeetingView)
+        .filter(DenormalizedMeetingView.id == meeting_id)
+        .first()
+    )
+
+    if not denorm_view:
+        # Create the denormalized view
+        update_denormalized_meeting_view(db, meeting_id)
+
+        # Try again
+        denorm_view = (
+            db.query(DenormalizedMeetingView)
+            .filter(DenormalizedMeetingView.id == meeting_id)
+            .first()
+        )
+
+        if not denorm_view:
+            # Meeting doesn't exist
+            return None
+
+    # Convert to Pydantic model for type checking and better data handling
+    attendees = [
+        DenormalizedAttendee(**attendee) for attendee in denorm_view.attendees_data
+    ]
+
+    action_items = [
+        DenormalizedActionItem(**item) for item in denorm_view.action_items_data
+    ]
+
+    transcript = [
+        DenormalizedTranscriptEntry(**entry) for entry in denorm_view.transcript_data
+    ]
+
+    # Create and return the full DenormalizedMeeting model
+    return DenormalizedMeeting(
+        id=denorm_view.id,
+        name=denorm_view.name,
+        created_at=denorm_view.created_at,
+        duration=denorm_view.duration,
+        url=denorm_view.url,
+        recording_url=denorm_view.recording_url,
+        notes=denorm_view.notes,
+        external_id=denorm_view.external_id,
+        received_at=denorm_view.received_at,
+        attendees=attendees,
+        action_items=action_items,
+        transcript=transcript,
+        last_updated=denorm_view.last_updated,
+    )

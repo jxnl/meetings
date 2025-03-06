@@ -92,11 +92,9 @@ class Attendee(Base):
     meetings = relationship(
         "Meeting", secondary=meeting_attendee, back_populates="attendees"
     )
-    
+
     # Add UniqueConstraint to ensure email is unique when not null
-    __table_args__ = (
-        UniqueConstraint('email', name='uix_attendee_email'),
-    )
+    __table_args__ = (UniqueConstraint("email", name="uix_attendee_email"),)
 
 
 class ActionItem(Base):
@@ -151,3 +149,41 @@ class TranscriptEntry(Base):
 
     # Relationships
     meeting = relationship("Meeting", back_populates="transcript_entries")
+
+
+class DenormalizedMeetingView(Base):
+    """
+    Denormalized view of meeting data for faster exports.
+    This table contains pre-processed data to avoid expensive joins at export time.
+
+    Attributes:
+        id: Unique identifier (same as the original meeting id)
+        name: Meeting name
+        created_at: When the meeting was created
+        duration: Duration of the meeting in seconds
+        url: URL of the meeting
+        recording_url: URL of the recording
+        notes: Meeting notes in markdown format
+        external_id: External ID from the source system
+        received_at: When the webhook was received
+        attendees_data: JSON representation of attendees
+        action_items_data: JSON representation of action items
+        transcript_data: JSON representation of the transcript, with formatted timestamps
+        last_updated: When this denormalized view was last updated
+    """
+
+    __tablename__ = "denormalized_meetings_view"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False)
+    duration = Column(Float, nullable=True)
+    url = Column(String(1024), nullable=True)
+    recording_url = Column(String(2048), nullable=True)
+    notes = Column(Text, nullable=True)
+    external_id = Column(Integer, nullable=True, index=True)
+    received_at = Column(DateTime(timezone=True))
+    attendees_data = Column(JSON, nullable=True)
+    action_items_data = Column(JSON, nullable=True)
+    transcript_data = Column(JSON, nullable=True)
+    last_updated = Column(DateTime(timezone=True), server_default="now()")

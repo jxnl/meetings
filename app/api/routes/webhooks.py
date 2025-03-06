@@ -39,7 +39,14 @@ async def receive_webhook(
 
     # Process the webhook payload
     try:
+        # Create the meeting
         meeting = meeting_service.create_meeting_from_webhook(db, payload)
+
+        # Update the denormalized view in the background
+        background_tasks.add_task(
+            meeting_service.update_denormalized_meeting_view, db, meeting.id
+        )
+
         return meeting
     except Exception as e:
         raise HTTPException(

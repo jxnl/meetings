@@ -30,6 +30,19 @@
 - ActionItem: Tasks/action items from meetings
 - TranscriptEntry: Meeting transcript with speaker text and timestamps
 - meeting_attendee: Join table for the many-to-many relationship
+- DenormalizedMeetingView: Pre-computed meeting data for efficient export
+  - Includes JSON columns for attendees, action items, and transcripts
+  - Timestamps pre-formatted for display
+  - Updated automatically via background tasks
+  
+## Pydantic Schemas
+- Models mirror the database structure but add validation and functionality
+- Separate schemas for creation, response, and denormalized data
+- DenormalizedMeeting schema with convenient helper methods:
+  - Automatic formatting of dates, durations, and timestamps
+  - Word count and other metrics calculations
+  - Type-safe conversion to export formats
+  - Simplified YAML generation with single method call
 
 ## Key Features
 - Webhook API for ingesting meeting data
@@ -37,7 +50,9 @@
 - Company domain visualization and statistics
 - Meeting filtering by domain or individual attendee
 - Interactive charts with clickable elements
-- YAML generation for meeting data export
+- Optimized YAML generation with denormalized data views
+- Background processing for data pre-computation
+- Type-safe data access with Pydantic models
 
 ## Frontend
 - Jinja2 templates with Bootstrap styling
