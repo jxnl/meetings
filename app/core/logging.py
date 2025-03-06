@@ -6,6 +6,7 @@ from functools import wraps
 from typing import Any, Callable, Optional, Sequence
 import inspect
 import logfire
+import time
 
 
 def trace(
@@ -15,6 +16,7 @@ def trace(
 ) -> Callable:
     """
     A decorator that creates a Logfire span around a function call and tracks specified arguments.
+    Also logs the execution time (latency) of the function.
 
     Args:
         name: Optional custom name for the span. Defaults to function name
@@ -55,18 +57,28 @@ def trace(
                         tracked_values[arg_name] = "<unprintable>"
 
             # Create span with function arguments as attributes
-            with logfire.span(span_name, attributes=tracked_values):
-                try:
-                    result = await func(*args, **kwargs)
-                    return result
-                except Exception as e:
-                    # Log exception within the span
-                    logfire.error(
-                        f"Error in {span_name}",
-                        exc_info=e,
-                        extra={"error_type": type(e).__name__},
-                    )
-                    raise
+            start_time = time.time()
+            span = logfire.span(span_name, attributes=tracked_values)
+            try:
+                with span:
+                    try:
+                        result = await func(*args, **kwargs)
+                        return result
+                    except Exception as e:
+                        # Log exception within the span
+                        logfire.error(
+                            f"Error in {span_name}",
+                            exc_info=e,
+                            extra={"error_type": type(e).__name__},
+                        )
+                        raise
+            finally:
+                latency_ms = (time.time() - start_time) * 1000
+                logfire.info(
+                    "{span_name} completed in {latency}",
+                    span_name=span_name,
+                    latency=round(latency_ms, 2),
+                )
 
         @wraps(func)
         def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -88,17 +100,27 @@ def trace(
                         tracked_values[arg_name] = "<unprintable>"
 
             # Create span with function arguments as attributes
-            with logfire.span(span_name, attributes=tracked_values):
-                try:
-                    result = func(*args, **kwargs)
-                    return result
-                except Exception as e:
-                    logfire.error(
-                        f"Error in {span_name}",
-                        exc_info=e,
-                        extra={"error_type": type(e).__name__},
-                    )
-                    raise
+            start_time = time.time()
+            span = logfire.span(span_name, attributes=tracked_values)
+            try:
+                with span:
+                    try:
+                        result = func(*args, **kwargs)
+                        return result
+                    except Exception as e:
+                        logfire.error(
+                            f"Error in {span_name}",
+                            exc_info=e,
+                            extra={"error_type": type(e).__name__},
+                        )
+                        raise
+            finally:
+                latency_ms = (time.time() - start_time) * 1000
+                logfire.info(
+                    "{span_name} completed in {latency}",
+                    span_name=span_name,
+                    latency=round(latency_ms, 2),
+                )
 
         # Return appropriate wrapper based on if function is async
         return async_wrapper if inspect.iscoroutinefunction(func) else sync_wrapper
