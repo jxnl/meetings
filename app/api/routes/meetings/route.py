@@ -13,7 +13,14 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.meeting import Meeting, Attendee, DenormalizedMeetingView
-from app.services.meeting_service import get_meetings, get_meeting, get_attendees
+from app.services.meeting_service import (
+    get_meetings,
+    get_meeting,
+    get_attendees,
+    get_analytics_data,
+    get_user_analytics,
+    get_attendees_with_valid_emails,
+)
 from app.schemas.meeting import Meeting as MeetingSchema
 
 
@@ -243,5 +250,48 @@ async def generate_yaml(
             "request": request,
             "yaml_content": yaml_content,
             "meetings_count": len(meetings_data),
+        },
+    )
+
+
+@router.get("/analytics", response_class=HTMLResponse)
+async def meeting_analytics(
+    request: Request,
+    db: Session = Depends(get_db),
+    time_period: str = None,
+    email: str = None,
+):
+    """
+    Display analytics dashboard for meetings data.
+
+    Args:
+        request: FastAPI request object
+        db: Database session
+        time_period: Optional time period to filter by (week, month, year)
+        email: Optional user email to get user-specific analytics
+
+    Returns:
+        HTMLResponse: Rendered analytics template
+    """
+    # If email is provided, show user-specific analytics
+    if email:
+        analytics_data = get_user_analytics(db, email)
+        template_name = "meetings/user_analytics.html"
+    else:
+        # Otherwise show general analytics
+        analytics_data = get_analytics_data(db, time_period)
+        template_name = "meetings/analytics.html"
+
+    # Get list of attendees with emails for user selection dropdown
+    attendees = get_attendees_with_valid_emails(db)
+
+    return templates.TemplateResponse(
+        template_name,
+        {
+            "request": request,
+            "analytics": analytics_data,
+            "attendees": attendees,
+            "time_period": time_period or "all time",
+            "email": email,
         },
     )

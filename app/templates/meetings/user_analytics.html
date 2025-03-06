@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Meeting Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .chart-container {
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .section-title {
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .filter-controls {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="sticky-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>User Analytics: {{ analytics.user.name }}</h1>
+                    <p class="text-muted">{{ analytics.user.email }}</p>
+                </div>
+                <div>
+                    <a href="/meetings/analytics" class="btn btn-outline-secondary me-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        Back to Overview
+                    </a>
+                    <a href="/meetings/" class="btn btn-outline-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list me-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                        Meeting List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-controls">
+            <form method="get" action="/meetings/analytics" class="row align-items-end">
+                <div class="col-md-10">
+                    <label for="email" class="form-label">Select User</label>
+                    <select name="email" id="email" class="form-select">
+                        <option value="">Overview (All Users)</option>
+                        {% for attendee in attendees %}
+                            <option value="{{ attendee.email }}" {% if email == attendee.email %}selected{% endif %}>
+                                {{ attendee.name }} ({{ attendee.email }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                </div>
+            </form>
+        </div>
+
+        {% if analytics.error %}
+        <div class="alert alert-warning">
+            {{ analytics.error }}
+        </div>
+        {% else %}
+
+        <!-- User Stats Cards -->
+        <h2 class="section-title">Meeting Participation</h2>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Meetings</h5>
+                        <p class="display-4">{{ analytics.meeting_stats.total_meetings }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Hours</h5>
+                        <p class="display-4">{{ analytics.meeting_stats.total_duration_hours }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Avg. Duration</h5>
+                        <p class="display-4">{{ analytics.meeting_stats.avg_duration_minutes }}<small class="text-muted"> min</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Unique Collaborators</h5>
+                        <p class="display-4">{{ analytics.network.unique_co_attendees }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Speech Stats -->
+        <h2 class="section-title">Speech Analytics</h2>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Words Spoken</h5>
+                        <p class="display-4">{{ analytics.speech_stats.total_words }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Avg. Words per Meeting</h5>
+                        <p class="display-4">{{ analytics.speech_stats.avg_words_per_meeting }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Meetings with Transcript</h5>
+                        <p class="display-4">{{ analytics.speech_stats.meetings_with_transcript }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Item Stats -->
+        <h2 class="section-title">Action Items</h2>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Action Item Status</h5>
+                        <div class="chart-container">
+                            <canvas id="actionItemsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="card-title">Action Item Details</h5>
+                            <div>
+                                {% set completed = analytics.action_items.completed if analytics.action_items.completed is defined else 0 %}
+                                {% set in_progress = analytics.action_items.in_progress if analytics.action_items.in_progress is defined else 0 %}
+                                {% set pending = analytics.action_items.pending if analytics.action_items.pending is defined else 0 %}
+                                
+                                <span class="badge bg-success me-1">{{ completed }} Completed</span>
+                                <span class="badge bg-info me-1">{{ in_progress }} In Progress</span>
+                                <span class="badge bg-secondary">{{ pending }} Pending</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress mb-3" style="height: 25px;">
+                            {% set total = analytics.action_items.total if analytics.action_items.total is defined else 0 %}
+                            {% set completed_percent = (completed / total * 100) if total > 0 else 0 %}
+                            {% set progress_percent = (in_progress / total * 100) if total > 0 else 0 %}
+                            {% set pending_percent = (pending / total * 100) if total > 0 else 0 %}
+                            
+                            <div class="progress-bar bg-success" style="width: {{ completed_percent }}%" role="progressbar">
+                                {{ completed }}
+                            </div>
+                            <div class="progress-bar bg-info" style="width: {{ progress_percent }}%" role="progressbar">
+                                {{ in_progress }}
+                            </div>
+                            <div class="progress-bar bg-secondary" style="width: {{ pending_percent }}%" role="progressbar">
+                                {{ pending }}
+                            </div>
+                        </div>
+                        
+                        <p class="mb-0">
+                            You have a total of <strong>{{ total }}</strong> action items assigned, 
+                            with <strong>{{ completed }}</strong> completed 
+                            ({{ (completed_percent|round|int) }}% completion rate).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word Counts by Meeting -->
+        <h2 class="section-title">Top Meetings by Word Count</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="wordCountsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Meeting</th>
+                                        <th>Date</th>
+                                        <th>Words</th>
+                                        <th>% of Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in analytics.speech_stats.meeting_word_counts %}
+                                    <tr>
+                                        <td>
+                                            <a href="/meetings/?meeting_id={{ meeting.meeting_id }}">
+                                                {{ meeting.meeting_name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ meeting.created_at.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ meeting.words_spoken }}</td>
+                                        <td>
+                                            {% if meeting.meeting_total_words > 0 %}
+                                                {{ ((meeting.words_spoken / meeting.meeting_total_words) * 100) | round(1) }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% if not analytics.speech_stats.meeting_word_counts %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No meeting transcript data available</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if not analytics.error %}
+            // Action items chart
+            const actionItemsCtx = document.getElementById('actionItemsChart').getContext('2d');
+            let completed = {{ analytics.action_items.completed if analytics.action_items.completed is defined else 0 }};
+            let inProgress = {{ analytics.action_items.in_progress if analytics.action_items.in_progress is defined else 0 }};
+            let pending = {{ analytics.action_items.pending if analytics.action_items.pending is defined else 0 }};
+            
+            const actionItemsData = {
+                labels: ['Completed', 'In Progress', 'Pending'],
+                datasets: [{
+                    label: 'Action Items',
+                    data: [completed, inProgress, pending],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(23, 162, 184, 0.7)',
+                        'rgba(108, 117, 125, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(108, 117, 125, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            new Chart(actionItemsCtx, {
+                type: 'doughnut',
+                data: actionItemsData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+            
+            // Word counts by meeting chart
+            const wordCountsCtx = document.getElementById('wordCountsChart').getContext('2d');
+            const meetingWordCounts = {{ analytics.speech_stats.meeting_word_counts | tojson }};
+            
+            // Only show top 5 meetings in the chart
+            let meetingNames = [];
+            let meetingWordCount = [];
+            
+            if (meetingWordCounts && meetingWordCounts.length) {
+                const topMeetings = meetingWordCounts.slice(0, 5);
+                meetingNames = topMeetings.map(m => m.meeting_name.length > 15 ? 
+                                                m.meeting_name.substring(0, 15) + '...' : 
+                                                m.meeting_name);
+                meetingWordCount = topMeetings.map(m => m.words_spoken);
+            } else {
+                meetingNames = ["No data"];
+                meetingWordCount = [0];
+            }
+            
+            new Chart(wordCountsCtx, {
+                type: 'bar',
+                data: {
+                    labels: meetingNames,
+                    datasets: [{
+                        label: 'Words Spoken',
+                        data: meetingWordCount,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

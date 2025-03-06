@@ -2,10 +2,11 @@
 Service for handling meeting data operations.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
+from sqlalchemy import func, case, and_
 from sqlalchemy.orm import Session
 
 from app.models.meeting import (
@@ -441,3 +442,249 @@ def get_denormalized_meeting(
         transcript=transcript,
         last_updated=denorm_view.last_updated,
     )
+
+
+def get_analytics_data(
+    db: Session, time_period: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Get analytics data for all meetings, optionally filtered by time period.
+
+    Args:
+        db: Database session
+        time_period: Optional time filter (week, month, year)
+
+    Returns:
+        Dict with various analytics metrics
+    """
+    # Set up time filter if specified
+    date_filter = None
+    if time_period:
+        now = datetime.now()
+        if time_period == "week":
+            date_filter = now - timedelta(days=7)
+        elif time_period == "month":
+            date_filter = now - timedelta(days=30)
+        elif time_period == "year":
+            date_filter = now - timedelta(days=365)
+
+    # Base query for meetings
+    meetings_query = db.query(Meeting)
+    if date_filter:
+        meetings_query = meetings_query.filter(Meeting.created_at >= date_filter)
+
+    # Get all meetings in the time period
+    meetings = meetings_query.all()
+
+    # Basic meeting metrics
+    total_meetings = len(meetings)
+    total_duration = sum(meeting.duration or 0 for meeting in meetings)
+    avg_duration = total_duration / total_meetings if total_meetings > 0 else 0
+
+    # Get meeting counts by month
+    meetings_by_month = {}
+    for meeting in meetings:
+        month_key = meeting.created_at.strftime("%Y-%m")
+        if month_key in meetings_by_month:
+            meetings_by_month[month_key] += 1
+        else:
+            meetings_by_month[month_key] = 1
+
+    # Ensure at least one entry
+    if not meetings_by_month:
+        meetings_by_month = {"2025-03": 0}
+
+    # Get transcript word counts for each meeting
+    meeting_word_counts = []
+    for meeting in meetings:
+        try:
+            # Get denormalized meeting data for transcript analysis
+            denorm_meeting = get_denormalized_meeting(db, meeting.id)
+            if denorm_meeting and denorm_meeting.transcript:
+                # Calculate word count
+                word_count = denorm_meeting.transcript_word_count()
+
+                # Get word counts by speaker
+                speaker_word_counts = {}
+                for entry in denorm_meeting.transcript:
+                    speaker = entry.speaker
+                    words = len(entry.text.split())
+
+                    if speaker in speaker_word_counts:
+                        speaker_word_counts[speaker] += words
+                    else:
+                        speaker_word_counts[speaker] = words
+
+                meeting_word_counts.append(
+                    {
+                        "meeting_id": meeting.id,
+                        "meeting_name": meeting.name,
+                        "created_at": meeting.created_at,
+                        "total_words": word_count,
+                        "speaker_word_counts": speaker_word_counts,
+                    }
+                )
+        except Exception as e:
+            # Log error but continue processing other meetings
+            print(f"Error processing meeting {meeting.id}: {str(e)}")
+
+    # Sort meetings by word count
+    meeting_word_counts.sort(key=lambda x: x["total_words"], reverse=True)
+
+    # Top speakers across all meetings
+    all_speakers = {}
+    for meeting_data in meeting_word_counts:
+        for speaker, count in meeting_data["speaker_word_counts"].items():
+            if speaker in all_speakers:
+                all_speakers[speaker]["total_words"] += count
+                all_speakers[speaker]["meeting_count"] += 1
+            else:
+                all_speakers[speaker] = {"total_words": count, "meeting_count": 1}
+
+    # Convert to list and sort by total words
+    top_speakers = [{"name": speaker, **data} for speaker, data in all_speakers.items()]
+    top_speakers.sort(key=lambda x: x["total_words"], reverse=True)
+
+    # Ensure we have at least an empty list if no speakers found
+    if not top_speakers:
+        top_speakers = []
+
+    # Get action item statistics
+    action_items_query = db.query(ActionItem)
+    if date_filter:
+        # Join to meeting to apply the date filter
+        action_items_query = action_items_query.join(Meeting).filter(
+            Meeting.created_at >= date_filter
+        )
+
+    action_items = action_items_query.all()
+    action_item_counts = {
+        "total": len(action_items),
+        "completed": len([item for item in action_items if item.status == "completed"]),
+        "pending": len([item for item in action_items if item.status == "pending"]),
+        "in_progress": len(
+            [item for item in action_items if item.status == "in_progress"]
+        ),
+    }
+
+    # Return the compiled analytics data
+    return {
+        "total_meetings": total_meetings,
+        "total_duration_hours": round(total_duration / 3600, 1),
+        "avg_duration_minutes": round(avg_duration / 60, 1),
+        "meetings_by_month": dict(sorted(meetings_by_month.items())),
+        "meeting_word_counts": meeting_word_counts[
+            :10
+        ],  # Top 10 meetings by word count
+        "top_speakers": top_speakers[:10],  # Top 10 speakers by word count
+        "action_items": action_item_counts,
+    }
+
+
+def get_user_analytics(db: Session, email: str) -> Dict[str, Any]:
+    """
+    Get analytics data for a specific user by email.
+
+    Args:
+        db: Database session
+        email: User's email address
+
+    Returns:
+        Dict with user-specific analytics metrics
+    """
+    # Find the attendee by email
+    attendee = db.query(Attendee).filter(Attendee.email == email).first()
+    if not attendee:
+        return {"error": "User not found"}
+
+    # Get all meetings this user attended
+    meetings = attendee.meetings
+    total_meetings = len(meetings)
+
+    # Calculate total time spent in meetings
+    total_duration = sum(meeting.duration or 0 for meeting in meetings)
+
+    # Get word counts for this user across all meetings
+    user_word_counts = []
+    user_total_words = 0
+    meetings_with_transcript = 0
+
+    for meeting in meetings:
+        denorm_meeting = get_denormalized_meeting(db, meeting.id)
+        if denorm_meeting and denorm_meeting.transcript:
+            meetings_with_transcript += 1
+            user_words = 0
+
+            # Count words spoken by this user
+            for entry in denorm_meeting.transcript:
+                if entry.speaker.lower() == attendee.name.lower():
+                    user_words += len(entry.text.split())
+
+            user_total_words += user_words
+
+            # Add to meeting-specific data
+            user_word_counts.append(
+                {
+                    "meeting_id": meeting.id,
+                    "meeting_name": meeting.name,
+                    "created_at": meeting.created_at,
+                    "words_spoken": user_words,
+                    "meeting_total_words": denorm_meeting.transcript_word_count(),
+                }
+            )
+
+    # Sort by words spoken
+    user_word_counts.sort(key=lambda x: x["words_spoken"], reverse=True)
+
+    # Get action items assigned to this user
+    action_items = db.query(ActionItem).filter(ActionItem.assignee_email == email).all()
+
+    action_item_stats = {
+        "total": len(action_items),
+        "completed": len([item for item in action_items if item.status == "completed"]),
+        "pending": len([item for item in action_items if item.status == "pending"]),
+        "in_progress": len(
+            [item for item in action_items if item.status == "in_progress"]
+        ),
+    }
+
+    # Calculate average words per meeting (only for meetings with transcripts)
+    avg_words_per_meeting = (
+        user_total_words / meetings_with_transcript
+        if meetings_with_transcript > 0
+        else 0
+    )
+
+    # Get co-attendees
+    co_attendees = set()
+    for meeting in meetings:
+        for co_attendee in meeting.attendees:
+            if co_attendee.id != attendee.id and co_attendee.email:
+                co_attendees.add((co_attendee.id, co_attendee.name, co_attendee.email))
+
+    # Return the compiled user analytics
+    return {
+        "user": {
+            "name": attendee.name,
+            "email": attendee.email,
+        },
+        "meeting_stats": {
+            "total_meetings": total_meetings,
+            "total_duration_hours": round(total_duration / 3600, 1),
+            "avg_duration_minutes": (
+                round((total_duration / total_meetings) / 60, 1)
+                if total_meetings > 0
+                else 0
+            ),
+        },
+        "speech_stats": {
+            "total_words": user_total_words,
+            "avg_words_per_meeting": round(avg_words_per_meeting, 0),
+            "meetings_with_transcript": meetings_with_transcript,
+            "meeting_word_counts": user_word_counts[
+                :10
+            ],  # Top 10 meetings by word count
+        },
+        "action_items": action_item_stats,
+        "network": {"unique_co_attendees": len(co_attendees)},
+    }

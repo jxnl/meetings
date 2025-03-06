@@ -924,22 +924,29 @@ payloads = {
 }
 
 
-def main():
-    """Send all webhook payloads to the API."""
+import asyncio
+import aiohttp
+
+
+async def main():
+    """Send all webhook payloads to the API asynchronously."""
     # Check if a specific payload was requested
     if len(sys.argv) > 1 and sys.argv[1] in payloads:
         payload_id = sys.argv[1]
-        send_payload(payload_id, payloads[payload_id])
+        await send_payload(payload_id, payloads[payload_id])
     else:
         # Send all payloads
         print(f"Sending all {len(payloads)} webhook payloads to: {WEBHOOK_URL}")
+        tasks = []
         for payload_id, payload in payloads.items():
             print("\n" + "-" * 50)
-            send_payload(payload_id, payload)
+            tasks.append(send_payload(payload_id, payload))
+
+        await asyncio.gather(*tasks)
 
 
-def send_payload(payload_id, payload):
-    """Send a single webhook payload to the API."""
+async def send_payload(payload_id, payload):
+    """Send a single webhook payload to the API asynchronously."""
     print(f"Using payload {payload_id}: {payload['name']}")
     print(f"Attendees: {len(payload['attendees'])} people")
     print("Sending webhook payload to:", WEBHOOK_URL)
@@ -949,22 +956,27 @@ def send_payload(payload_id, payload):
         payload_json = json.dumps(payload, default=str)
 
         # Send the webhook payload
-        response = requests.post(
-            WEBHOOK_URL, data=payload_json, headers={"Content-Type": "application/json"}
-        )
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                WEBHOOK_URL,
+                data=payload_json,
+                headers={"Content-Type": "application/json"},
+            ) as response:
+                status_code = response.status
+                if status_code < 400:
+                    response_data = await response.json()
+                    response_text = json.dumps(response_data, indent=2)
+                else:
+                    response_text = await response.text()
 
-        # Print the response
-        print(f"Status code: {response.status_code}")
-        print("Response:")
-        print(
-            json.dumps(response.json(), indent=2)
-            if response.status_code < 400
-            else response.text
-        )
+                # Print the response
+                print(f"Status code: {status_code}")
+                print("Response:")
+                print(response_text)
 
     except Exception as e:
         print(f"Error: {str(e)}")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
