@@ -15,10 +15,21 @@ from sqlalchemy import (
     Text,
     ForeignKey,
     JSON,
+    Table,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+
+
+# Association table for the many-to-many relationship between Meeting and Attendee
+meeting_attendee = Table(
+    "meeting_attendee",
+    Base.metadata,
+    Column("meeting_id", Integer, ForeignKey("meetings.id"), primary_key=True),
+    Column("attendee_id", Integer, ForeignKey("attendees.id"), primary_key=True),
+)
 
 
 class Meeting(Base):
@@ -51,7 +62,7 @@ class Meeting(Base):
 
     # Relationships
     attendees = relationship(
-        "Attendee", back_populates="meeting", cascade="all, delete-orphan"
+        "Attendee", secondary=meeting_attendee, back_populates="meetings"
     )
     action_items = relationship(
         "ActionItem", back_populates="meeting", cascade="all, delete-orphan"
@@ -63,24 +74,29 @@ class Meeting(Base):
 
 class Attendee(Base):
     """
-    Attendee database model for storing meeting attendees.
+    Attendee database model for storing unique attendees across meetings.
 
     Attributes:
         id: Unique identifier
         name: Attendee name
-        email: Attendee email
-        meeting_id: Foreign key to the meeting
+        email: Attendee email (unique)
     """
 
     __tablename__ = "attendees"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=True)
-    meeting_id = Column(Integer, ForeignKey("meetings.id"), nullable=False)
+    email = Column(String(255), nullable=True, unique=True, index=True)
 
     # Relationships
-    meeting = relationship("Meeting", back_populates="attendees")
+    meetings = relationship(
+        "Meeting", secondary=meeting_attendee, back_populates="attendees"
+    )
+    
+    # Add UniqueConstraint to ensure email is unique when not null
+    __table_args__ = (
+        UniqueConstraint('email', name='uix_attendee_email'),
+    )
 
 
 class ActionItem(Base):

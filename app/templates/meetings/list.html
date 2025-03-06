@@ -59,13 +59,34 @@
     <div class="container py-4">
         <div class="sticky-header mb-4">
             <div class="d-flex justify-content-between align-items-center">
-                <h1>Meetings</h1>
+                <div class="d-flex align-items-center">
+                    <h1 class="me-3">Meetings</h1>
+                    <a href="/meetings/domains" class="btn btn-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building me-1" viewBox="0 0 16 16">
+                            <path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3V2zm12 0H9v12h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2"></path>
+                        </svg>
+                        View Company Domains
+                    </a>
+                </div>
                 <div>
                     <button id="selectAllBtn" class="btn btn-outline-primary me-2">Select All</button>
                     <button id="deselectAllBtn" class="btn btn-outline-secondary me-2">Deselect All</button>
                     <button id="generateYamlBtn" class="btn btn-primary">Generate Meeting Prompt</button>
                 </div>
             </div>
+            
+            {% if filter_description %}
+            <div class="alert alert-info mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Filtered by:</strong> {{ filter_description }} 
+                        <span class="badge bg-primary ms-2">{{ filtered_count }} of {{ total_meetings }} meetings</span>
+                    </div>
+                    <a href="/meetings/" class="btn btn-sm btn-outline-secondary">Clear Filter</a>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <form id="meetingsForm" method="post" action="/meetings/generate-yaml">
@@ -163,11 +184,17 @@
                     // Extract YAML content from the response
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-                    const yamlText = doc.getElementById('yamlContent').textContent;
+                    const yamlContent = doc.querySelector('#yamlContent');
+                    const yamlText = yamlContent ? yamlContent.textContent : '';
                     
                     // Display the YAML
-                    yamlContent.textContent = yamlText;
-                    yamlResult.classList.remove('hidden');
+                    const localYamlContent = document.getElementById('yamlContent');
+                    if (localYamlContent && yamlText) {
+                        localYamlContent.textContent = yamlText;
+                        yamlResult.classList.remove('hidden');
+                    } else {
+                        alert('Error: YAML content could not be loaded. Check server logs.');
+                    }
                     
                     // Scroll to the result
                     yamlResult.scrollIntoView({ behavior: 'smooth' });

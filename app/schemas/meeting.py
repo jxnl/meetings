@@ -25,7 +25,6 @@ class Attendee(AttendeeBase):
     """Schema for attendee response."""
 
     id: int
-    meeting_id: int
 
     class Config:
         """Pydantic configuration."""
