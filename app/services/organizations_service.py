@@ -1,8 +1,8 @@
 from collections import defaultdict
-from typing import List
+from typing import List, Dict, Set
 
 from app.core.logging import trace
-from app.models.meeting import Attendee
+from app.models.meeting import Attendee, Meeting
 from app.services.meeting_service import (
     get_attendees_with_valid_emails,
     get_meeting_by_ids,
@@ -40,17 +40,25 @@ def _get_attendee_by_ids(db, attendee_ids: List[int]) -> List[Attendee]:
 
 def get_organizations(db) -> List[dict]:
     organizations = defaultdict(list)
+    all_meeting_ids: Set[int] = set()
+    domain_meeting_ids: Dict[str, Set[int]] = defaultdict(set)
 
+    # Fetch all attendees with valid emails (this already loads meetings relationship)
     attendees = get_attendees_with_valid_emails(db)
 
+    # First pass: organize attendees by domain and collect all meeting IDs
     for attendee in attendees:
-        if attendee.email is None:
+        if not attendee.email:
             continue
+
         email_parts = attendee.email.split("@")
         if len(email_parts) != 2:
             continue
+
         domain = email_parts[1].lower()
         domain_key = attendee.email.lower() if domain in GENERIC_DOMAINS else domain
+
+        # Add attendee to appropriate organization
         organizations[domain_key].append(
             {
                 "id": attendee.id,
@@ -60,41 +68,33 @@ def get_organizations(db) -> List[dict]:
             }
         )
 
+        # Collect meeting IDs for this attendee
+        attendee_meeting_ids = {meeting.id for meeting in attendee.meetings}
+        domain_meeting_ids[domain_key].update(attendee_meeting_ids)
+        all_meeting_ids.update(attendee_meeting_ids)
+
+    # Single fetch for all meetings across all organizations
+    all_meetings_by_id: Dict[int, Meeting] = {}
+    if all_meeting_ids:
+        meetings = get_meeting_by_ids(db, list(all_meeting_ids))
+        all_meetings_by_id = {meeting.id: meeting for meeting in meetings}
+
+    # Second pass: compile organization data with meeting information
     org_data = []
     for domain, members in organizations.items():
         action_items = []
         meeting_notes = []
-        meeting_ids = set()
 
-        # Get attendee objects by ID
-        attendee_objs_by_id = {
-            attendee.id: attendee
-            for attendee in _get_attendee_by_ids(
-                db, [member["id"] for member in members]
-            )
-        }
+        # Get meeting IDs for this domain
+        meeting_ids = domain_meeting_ids[domain]
 
-        for member in members:
-            attendee_obj = attendee_objs_by_id.get(member["id"])
-            if not attendee_obj:
-                continue
-            for meeting in attendee_obj.meetings:
-                meeting_ids.add(meeting.id)
-
-        # Get all meetings for this organization in a single query (more efficient than fetching individually)
-        meetings_by_id = (
-            {
-                meeting.id: meeting
-                for meeting in get_meeting_by_ids(db, list(meeting_ids))
-            }
-            if meeting_ids
-            else {}
-        )
-
+        # Process meetings for this domain
         for meeting_id in meeting_ids:
-            meeting = meetings_by_id.get(meeting_id)
+            meeting = all_meetings_by_id.get(meeting_id)
             if not meeting:
                 continue
+
+            # Process action items
             for item in meeting.action_items:
                 if item.status.upper() != "COMPLETED":
                     action_items.append(
@@ -109,6 +109,8 @@ def get_organizations(db) -> List[dict]:
                             "meeting_name": meeting.name,
                         }
                     )
+
+            # Process meeting notes
             if meeting.notes is not None:
                 meeting_notes.append(
                     {
@@ -119,6 +121,7 @@ def get_organizations(db) -> List[dict]:
                     }
                 )
 
+        # Create organization data
         org_data.append(
             {
                 "domain": domain,
@@ -137,5 +140,6 @@ def get_organizations(db) -> List[dict]:
             }
         )
 
+    # Sort organizations by member count in descending order
     org_data.sort(key=lambda x: x["member_count"], reverse=True)
     return org_data
