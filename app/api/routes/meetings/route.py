@@ -130,6 +130,7 @@ async def list_meetings(
             "filter_description": filter_description,
             "total_meetings": len(all_meetings),
             "filtered_count": len(filtered_meetings),
+            "active_page": "meetings",
         },
     )
 
@@ -199,6 +200,7 @@ async def list_company_domains(request: Request, db: Session = Depends(get_db)):
             "domains": domain_list,
             "total_domains": len(domain_list),
             "total_company_attendees": sum(len(d["attendees"]) for d in domain_list),
+            "active_page": "domains",
         },
     )
 
@@ -251,6 +253,7 @@ async def generate_yaml(
             "request": request,
             "yaml_content": yaml_content,
             "meetings_count": len(meetings_data),
+            "active_page": "meetings",  # Since this is derived from the meetings page
         },
     )
 
@@ -294,6 +297,7 @@ async def meeting_analytics(
             "attendees": attendees,
             "time_period": time_period or "all time",
             "email": email,
+            "active_page": "analytics",
         },
     )
 
@@ -411,6 +415,7 @@ async def list_organizations(request: Request, db: Session = Depends(get_db)):
             "organizations": org_data,
             "total_organizations": len(org_data),
             "total_action_items": sum(org["action_items_count"] for org in org_data),
+            "active_page": "organizations",
         },
     )
 
