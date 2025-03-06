@@ -1,0 +1,487 @@
+{
+    "id": 9404775,
+    "name": "Meeting with Jason Liu",
+    "createdAt": "2025-03-05T19:58:59.956Z",
+    "duration": 2080.74,
+    "url": "https://meet.google.com/rwp-rrhk-bys",
+    "attendees": [
+        {
+            "name": "Jason Liu",
+            "email": "jason@jxnl.co"
+        },
+        {
+            "name": "Jason Lopatecki",
+            "email": "jason@arize.com"
+        },
+        {
+            "name": "Aparna Dhinakaran",
+            "email": "aparna@arize.com"
+        }
+    ],
+    "recordingUrl": "https://storage.googleapis.com/saved-meeting-recording.prod.circleback.ai/meeting_1019641.mp4?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=circleback-ai%40appspot.gserviceaccount.com%2F20250306%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20250306T005050Z&X-Goog-Expires=28800&X-Goog-SignedHeaders=host&X-Goog-Signature=8b19f62b9f8e2072ee9178b4968b430644cbd63dc489ad7a05ae07361b4987bf3fe02f378c32c29402917567b885520041bfd69c830be8474b6ee0c3c4d9d267ef2dbd307077fd6ead1e5cc984cade19a0c35bb21893ff3c2e4abf6aae5adec354cd55dd97de59c76f80def6f30da24a190b928be32b930db0470ff9b81c8cd4eb5ced1bd1800672a434da0d5a77c13d89525bac4fe450a270c83fe1832f2de0ddd87579ef7af9f8f81570da5097f364ab4cbedb24d759562586ddedb1bd6452d7e88a8f4452cc39157f0415637a6b2544171bf3b20e371908c564722bfaaa2b8b06fb51b1796556b4d6a43ae9ce7ec9618abe38d953f2929e39579c7615c51c",
+    "notes": "#### Overview\n* Jason Liu and Arize leadership explored potential research collaboration focused on AI agent evaluation and prompt optimization\n* Jason Liu prioritizing course sustainability before starting independent research, primarily focused on retrieval/RAG systems\n* Arize offered infrastructure and data support for collaborative research projects\n* Next steps: Aparna to send concrete research collaboration proposals\n* Timeline constraint: Jason Liu traveling to Europe/Asia in **April 2025**\n\n#### Team introductions and backgrounds\n* Jason Lopatecki shared background as second-time entrepreneur:\n    * Previously built TubeMogul (competitor to Trade Desk) which went public\n    * Technical background from Berkeley EECS\n    * Currently delivers PRs and remains hands-on technical leader at Arize\n* Aparna highlighted technical background from Berkeley and Uber\n* Jason Liu noted current physical constraint of RSI limiting coding to **1 hour** per day\n    * Uses dictation systems for content creation\n    * Manages extensive content through systematic approach including automated tweet scheduling\n\n#### Jason Liu's current focus and goals\n* Primary near-term goal is making courses self-sustainable\n* Aims to build cash flow to support independent research team\n* Plans to focus research primarily on retrieval and RAG work\n* Background includes:\n    * Started in physics around AlexNet era\n    * Specialized in multimodal image retrieval\n    * Built recommendation systems and observability platforms\n\n#### Retrieval and data analysis research areas\n* Jason Liu emphasized importance of data mining for few-shot examples\n* Jason Liu proposed analyzing historical data to build scoring systems and rubrics\n* Jason Liu highlighted example of Raycast integration analysis:\n    * Found **60%** of users using Excel spreadsheets\n    * Only **8%** using Notion integration\n    * Used findings to recommend resource reallocation\n\n#### Prompt optimization and feedback loops\n* Arize working on self-improving systems using:\n    * Real decision evaluations\n    * Explanation-based error terms\n    * Dynamic prompt adjustments\n* Jason Liu suggested approach for workflow planning:\n    * List expected workflow before function calls\n    * Collect human approval ratings\n    * Use approved workflows as few-shot examples\n    * Target **90%+** acceptance rate for auto-accept consideration\n\n#### Agent evaluation and workflow planning\n* Arize exploring vertical-specific evaluations for:\n    * SDR assistants\n    * Travel planning assistants\n    * UI browser control\n* Jason Liu proposed focusing on MCP (Minimal Client Protocol) compatible agents:\n    * Enables standardized planning evaluation\n    * Allows for synthetic data generation\n    * Supports systematic few-shot example testing",
+    "actionItems": [
+        {
+            "id": 2564928,
+            "title": "Create collaboration areas proposal document",
+            "description": "Create and send document to Jason Liu outlining specific areas for potential research collaboration based on initial discussion",
+            "assignee": {
+                "name": "Aparna Dhinakaran",
+                "email": "aparna@arize.com"
+            },
+            "status": "PENDING"
+        }
+    ],
+    "transcript": [
+        {
+            "speaker": "Jason Liu",
+            "text": "Same room. How lovely.",
+            "timestamp": 3.68
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "What's happening? Very good.",
+            "timestamp": 7.92
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Just going back and forth in New York and sf.",
+            "timestamp": 9.92
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, I feel like the, the Jason density on this call is.",
+            "timestamp": 12.904
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I can bring in the other.",
+            "timestamp": 18.16
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Jason. The circle.",
+            "timestamp": 22.72
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "You just got back, right? Like you were in New York all the way through the third or something.",
+            "timestamp": 26.73
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, I got back two days ago. So I'm still on east coast time. I gotta meetings to west coast time, otherwise I'm waking up at 5am oh nice, nice.",
+            "timestamp": 31.21
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Well, I don't know if we've ever done like just get to know us for like a little bit. Like, you know, why don't Jason. Maybe you can kick Jason on our side, I guess like maybe you can kick off and just do a little like, you know, intro of yourself just so that you get a little feel for us. And I just want to say that both of us have been massive fans of you and the content and stuff we've been putting out. So yeah, I'm excited to finally get a chance to meet with you.",
+            "timestamp": 40.482
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "My Twitter's pretty crazy, but I promise I'm a regular person.",
+            "timestamp": 67.996
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "I don't know how you put out so many tweets. Let's just put it that way. We, we aspire. But, but great, great, great to connect. So me and our partner both, you know, technical, you know, technical backgrounds, Berkeley EECs. I, you know, I, I just, I don't, I think both of us like deeply love just building, building stuff. So, so I think if we didn't weren't doing this, we'd be coding somewhere, doing something in, in, in some toug. I think from us you've got like two people who are pretty really hands on. I still deliver PRs as much as the team. Like, you know, I get cringes when that every time I do. But I think it's important for teams to, it's just important for you to build. It's important for you, I think debugging and troubleshooting. You just can't learn something without doing that. So try to do as much as possible. Myself, you know, I also second time entrepreneur, you know, built a company from, you know, that early stage to public prior and I just like, like myself went public, it got bought and to be honest, it was like, it's like the dream you have. You're like, you know, I want to do this and then I'm going to like take a break. You know, I want to sit on the beach. It's kind of like you're like, you're sitting these hard nights and going like oh, this is what I, you know, I just dream about this beach. And I took about six months with the family and we like travel the world and like. And I was kind of like sitting on beaches and realizing like yeah, this is not as, you know, it's fun for the first week or two. Like. But like you don't just not fulfilling, you know, you're just like okay, what do I have a bunch of books read? You know, it's like what have I done? So for me I kind of wanted to. Really really wanted to just build something again. Like, like I and build something love just have it like building tactic building, you know, building company. And I got like my previous company was. Was this company to mogul which is in programmatic advertising. I don't, I don't know if you know the trade desk, it's. That was my biggest competitor is this, you know, end up being a. The space was massive. We didn't realize it, but they're $40 billion company now. My biggest competitor. And really it was real time auctions page loads and you're dealing with trillions of events a month and trying to value space. And we used original word of hack embeddings. I don't know if you remember the original word. So we used every tool in the ML toolbox and. And it was just really hard for me. It was like so hard to debug and troubleshoot all of it. And I'm like there's gotta be better tools. So that was kind of like the impetus for what arise here. And Aparna was on the team. She was at Berkeley as an intern at my previous company. We tried to get her back but she snubbed us and went to Uber so we couldn't hire her. And then she was at Uber for a bunch of years before we, we like reconnecting. We're like, okay, let's go build this thing. So that was kind of the impetus. And I think yeah, the last couple years have been insane. I know you're pre AI in the ML space and kind of have seen like, I mean the new spaces. There's a reality of value. There's a lot of hype and there's like sometimes it's hard to kind of surface who's real and who, who's. Who's full of it and like what, what, you know, who's really building something real. And I, you know, I don't. Maybe it's a little easier this year than it was last year. But like it's, you know, I Think, but, but I, I, I kind of my take is, is, you know, I love the stuff you put out, but I do feel like you, you, you're in the details. You, you, you're like in the tech. You love tech. It's clear. You build, you know what you're talking about. Like, you know, you know, there's certain folks we follow that I feel like we get something from. So, so awesome to meet you. That's my long, long winded intro.",
+            "timestamp": 72.86
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Yeah. Now I'll be slightly shorter because I want to jump into how we can work together. Jason. Yeah, like Jason said, technical background. Also Berkeley spent a number of years just being an engineer and I got into this problem also similar to Jason on more on the ML side. Originally put a bunch of models into production, didn't really work in the real world like we thought it would and spend a bunch of time just in the trenches kind of debugging and it was hard. And I think even as we've especially over the last year, I think evals have probably gotten even more important in the last year. 2 and I don't know if you've probably been following all the Twitter stuff around 4 versus 4.5 and not having evals to be able to understand how good 4.5 is. I think there's evals on the models, there's evals on the applications, and I think we are just deeply working with folks on the ground who are building these applications and seeing how important it is. It's a big part of, I think, you know, what we build, what we build. And so I, you know, just first, maybe just to be real with you, we just love what you put out, love what you put out, love kind of the work you do. Hamel honestly couldn't talk more highly of you and I think what we wanted to do was find a way to collaborate on some cool research with you. There's a lot that we're actually like has been cooking on our side for a while around like we're releasing some, the largest, I think hallucinations benchmark. We're releasing or kicked off on some like agent evaluation work. And I think we just wanted to find a way to collaborate with you on this and what I could do is talk through some of the ideas but maybe just first like would you be open to being able to collaborate? Like what, what are you looking for?",
+            "timestamp": 333.17
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, so I guess same comment as the beach. One of my near term goals is just actually take a vacation. I think I delayed my vacation by two years. My near term Goal is basically like, I can go like the whole journey actually, which is number one, is just make the courses sustainable and like sort of self serving in some way. Like just once I can close the loop on marketing and I can go like, great, I've made like a small business and now I can use that cash to sort of like do more independent research. Because I also have a team that wants to make sure that like, you know, if I, if I get hit by a car, like at least for many months, they can, they're, they're taken care of. And then afterwards that independent research I think is mostly going to be around like the retrieval rag work primarily because I think the first chapter of my consulting has just been only helping companies that do retrieval because my background is actually kind of. I basically left physics when Alexnet came out. I think this is going to be pretty relevant. Most of my work was on multimodal image retrieval. As we did all the research on building set, recommendation, image retrieval, YOLO and all that stuff, we started building out the recommendation systems. I had also built out the observability platform and the frameworks to deliver all the recommendations. Then I had RSI that I couldn't code anymore. I was like, oh fuck, I don't know when it was supposed to be useful. And then turns out if you just turn jpegs into TSD files, everything had been done from like both the research deployment and observability mapped to basically what rag is. Right?",
+            "timestamp": 454.93
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yep. Yeah.",
+            "timestamp": 550.338
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "You said you got hit, you got, you can't code anymore. What happened? Sorry.",
+            "timestamp": 554.61
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I have an RSI in both my hands like an hour a day. Kind of just like hurts.",
+            "timestamp": 558.026
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Wow. Okay.",
+            "timestamp": 564.05
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "All of my tweets are dictation. I actually like, I actually just dictate like 40 tweets, put them in a queue and I just like, wow.",
+            "timestamp": 565.194
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Wow, okay.",
+            "timestamp": 572.504
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Wow.",
+            "timestamp": 573.592
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I have like massive systems for how I produce content. Like after this callback will propose like all the sound bites and I'll just like review them and like schedule a bunch of tweets.",
+            "timestamp": 574.04
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Wow.",
+            "timestamp": 586.4
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "But basically chapter one was do all the consulting come up the thesis as to like what can is happening? And then it was to wrap that in the course which is like, let me tell you what is happening for anyone who's like starting now. And independent research is more about like, let me dig deep, deeper into what are people asking during office hours right now. Like the course is like how you think about it. And a lot of the course is you need mechanisms to collect feedback, you need to create synthetic Data. You need to run things like hierarchical topic modeling to understand what your customers are asking for. Build individual indices to serve those use cases, fine tuning, batting models, Consider lexical search adaptability. And here are all the case studies.",
+            "timestamp": 587.92
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yep.",
+            "timestamp": 628.742
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "And my independent research is going to be ideally focused on just like, like making that more legitimate. I'm like, too. I'm far ahead enough that I can just say it, but I don't have like an open source thing to talk about. Like, there is no open source. Like a hierarchical classification model for conversations that are tuned to discover whether or not you have low inventory in your retrieval or you're lacking metadata to do certain kinds of filtering and that's a simple example. Or having different benchmarks on. Or having example applications that do question answering very well with high quality citations, not only on text, but for bounding boxes or images. I would like to be able to answer a question, have a box, and if I mouse over it, I literally see like the line in the database that answered that question. So in the table in a PDF, rather than just that, like, it's on page seven, right?",
+            "timestamp": 629.222
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah. Yeah.",
+            "timestamp": 689.008
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Those are some, like, smaller ideas, but that's kind of like the direction. Ideally, I can sort of take some of my independent work now that I have, like, enough cash flow that I can just pay people to work on these problems.",
+            "timestamp": 690.856
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Got it. In your case, confirming, like, you're like, focusing and going deeper in retrieval is kind of like the main direction you're thinking versus other research areas within maybe the eval space.",
+            "timestamp": 702.08
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I think that's mostly about like. Yeah, Like, I think the physics person in me is just like, I just want to like, point to where. I want to point to a place and just like. No, like all the, like the cannon, when you shoot the ball, it lands there.",
+            "timestamp": 721.47
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah. Right.",
+            "timestamp": 735.39
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "So for me, it's mostly about being right.",
+            "timestamp": 736.076
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah. Yeah.",
+            "timestamp": 738.092
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "If I wanted to win, I would just like, raise like, like a bunch of VC money and just try to do something crazy. Yeah. And for retrieval, that's just where I've seen most of the. Most of the case studies. Right. Like, yeah, for me, it was a very active decision to just try to specialize as much as possible in retrieval. Just because most of me being right came from things I did before 2020.",
+            "timestamp": 739.444
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah.",
+            "timestamp": 761.78
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "And so I just. On that.",
+            "timestamp": 762.282
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "I mean, I think retrieval is definitely. I mean, it's definitely an area which requires a lot of different things coming together. And you know, it's a tough technical problem, but it's also measurable. Like, there's. There's a bunch of things that, about it that, that are kind of nice from, from the space perspective. But I, I definitely think there's, you know, there's, there's, it's a little bit more fuzzy in the prompt space. Like, like there's things that we're working on or trying to test around like, you know, iterative self improving flows. But again it's, it's less retrieval oriented. But, but I, I think there's, I think the prompt space feels less, less around, you know, a meaty technical problem with a perfect solution. I guess it's, it's more, you know, slightly more engineering. But, but there's there, there is a, I don't know, there is science, there is research to be done. I think I just, it just looks slightly different than. Yeah, yeah.",
+            "timestamp": 764.514
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I think a little bit is also more like empowering. Better data analysis.",
+            "timestamp": 826.468
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yep.",
+            "timestamp": 830.388
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "1. And like, you know, for example, if we think about like, you know, understanding what kinds of capabilities and new tools are required to make your conversations with your agent like higher, more likely to succeed.",
+            "timestamp": 831.044
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Right.",
+            "timestamp": 845.818
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "A lot of that ends up just being like, how do you do the data analysis and be able to convince your manager, hey, 40% of queries asking for this thing that we don't have. I think if we took the effort to invest in pulling out these integrations, that's more valuable. We did analysis with Raycast and they had two engineers working on the notion integration. I was like 60% of people are using Excel spreadsheets, no one's working on this. And 8% is working on notion. Like what are we doing guys? And like teaching that has been very valuable. I guess on the other side of like the fuzzy prompting, a lot of it has been like just having good prompts for like synthetic data generation for like retrieval. Again, the answer is kind of locked in stone, but actually producing a data set that actually looks like production traffic, I think has been a big. I don't know if you would consider those evals because to me that's like very classical, like you know, complete loss.",
+            "timestamp": 845.986
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "But yeah, I mean, I would. I mean the synthetic data generation is you know, a component to the, I feel like data generation and good data in the first place to test your evals and test your system is one component to the whole thing. Maybe it doesn't fit totally in that the perfect name, but it's like something you got to do and do well to make the whole thing work. And so it's part of the problem set for sure. One area like we're Looking at a lot is in starting to test around is like, it's a little bit like if you think, I mean it's not really rl, but if you think of like the rl, the RL flow where you've got some goal, you've got some state space, you're moving in, you've got some error term, you've got some gradient based upon your problem. I do think there's, you know, I do think there's a parallel that's not exact but fits in the prompt space. So you've got evals that run, you know, off of real decisions, you've got explanations of evals. So we use those a lot which are just, just information of like why it thinks it's wrong, which is kind of like an error term that and it's at least it's an error term that can, that, that the LLM can use. You know, like, like the, the pure score is one thing but like the explanation is actually an error term that LLM can use. And, and kind of feeding those back as, as you know, those, those explanations or errors as things you might edit or change. And so kind of like some of the work we're doing is testing this self improving systems or self improving, you know, flows that, that, that like, like what does the future look like where it's not like things prompts aren't static and, and they're more dynamic based upon. And evals are something that's not static either. It's something that you're measuring and generating stuff off of. So that, that's kind of an area where we're trying to do a little bit of research and working ourselves.",
+            "timestamp": 900.29
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Yeah.",
+            "timestamp": 1029.09
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "One thing that I had taken a look at before was almost like data mining historical data to find good few thought examples where we've been doing a lot of lead scoring type algorithms. And so we, those are a rubric but we didn't have any examples. And so our first task was just like extract everything, use chain of thought, figure out where all the good examples are.",
+            "timestamp": 1029.506
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Right.",
+            "timestamp": 1051.67
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "And say okay, like this is what it means to have like two founders know each other. Yeah, like met and like yc, like you know, founder dating three weeks ago. They don't know each other and okay, so this is how we like build out a rubric for that and then we now can build like scoring systems. Is that kind of the same thing where you're almost like you're data mining the reasoning of incorrect labels to produce maybe like an array of few shots or an array of like other tips.",
+            "timestamp": 1052.006
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Exactly. I mean it's exactly, it's somewhat like that where essentially you're mining the explanations of the problems to generate instructions that your instructions to change and edit and modify what you're doing, but the idea of doing it continuously as the system's deployed. And maybe it's like you're not really editing the prompt live, but maybe you're accepting those changes or looking at them or looking at the instruction suggestions. So it's kind of like, like a little bit of, you know, how do you make this stuff slightly more dynamic? You know, how do you. And not that we have anything real, it's not anything we have any customers out there, but we're kind of testing some of these solutions to see if they really work.",
+            "timestamp": 1078.25
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "How much. So I guess I have not used Horizon up because I don't know, like usually when I built machine learning systems it's like the observability and the deployments are pretty tightly coupled. One thing we always do is we just have a lot of canary builds where we have different ways of trafficking, sorry, shadowing the traffic. So for example, a simple thing is we make a new algorithm, we deploy it and we just monitor okay for 1% of traffic, shadow that and then plot the probability of fail predictions over time. Right. We don't really have an intention should it be higher or lower. But just understanding, okay, at least they're kind of the same. It's not the issue that's happening.",
+            "timestamp": 1128.338
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Right.",
+            "timestamp": 1169.032
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Or like maybe you do it all of a sudden all the probability of sales like double the variance. What the hell happened here? I can imagine a system like that be pretty useful. I think there's a lot to steal from all of Tesla's data monitoring stuff where you can just again just every time a decision that is predicted that is not made, you save that and now you can have some kind of again kind of like different examples.",
+            "timestamp": 1169.216
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Yep. I think actually a couple people from our team come from that whole self driving space and they're, they're big on the whole like data mining, collecting of these examples and then pulling it back in I guess. Jason, maybe I can ask is the pro, like there's a lot actually here. There's, there's like, there's areas of research around the actual like identifying of those examples. Like I don't know if you've played around a ton with the OpenAI log probs, not too much.",
+            "timestamp": 1194.84
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I've kind of made the bet that they won't be available and like okay.",
+            "timestamp": 1227.37
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Okay there's, there's obviously also all the, like. There's a couple different ways I think to identify a little bit of this. Like how good was the, the actual response or the actual like collection of these examples? It could be through obviously Council of judges. It could be through the multiple probabilities. But I think there's a little bit of this and I think Claude's is actually better. I've just been testing with theirs. Their probability metrics I feel like are slightly better than open eyes, but whatever. There's some way of like day identifying these. Like what are the, you know, what are these few shot examples that you want to pull into your data set to then go use in your prompt optimization? Is, is that an area you, you're interested in? Like it's kind of tied with, you know, I guess a little bit more of the data mining work. But yeah, yeah.",
+            "timestamp": 1232.706
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "One of the experiments that like we try to do but just again it was like a prioritization thing where I just don't have access to a large data set that I can share publicly. Right. The simple example is, you know, once we. So one of the projects, one of the problems I like to sort of make people really think about is you want to do topic modeling over like all your input queries or conversations to figure out what kind of capability exist. So the hierarchical classification. So the hierarchical topic modeling is just so you can then look at it and come up with your own classes. A simple example could be whether or not they need daytime filtering versus like relative filtering.",
+            "timestamp": 1288.21
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Right.",
+            "timestamp": 1326.924
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Can you identify that? Like 10% of the population needs this and it's important they go build that out and then what we end up doing is we need to build classifiers. And so the question is like, do you want to have like fixed few shots to have a classifier? Should the classifiers have dynamic few shots where you're using like retrieval to find the similar examples? Those have been like questions we've done internally but haven't really published on. But is that kind of in the direction of what you're thinking about or is it a little bit more.",
+            "timestamp": 1327.556
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Are your classifiers LLMs or your classifiers?",
+            "timestamp": 1358.57
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, exactly, exactly. I think ideally they would just be like a burp model and it just works really well. But I think people are still very allergic to model training.",
+            "timestamp": 1361.154
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "And by classifiers, is it topics or is it like an eval classifier trying to eval something which is essentially a classifier?",
+            "timestamp": 1371.53
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I would say it's almost the same thing. Yeah, a lot of it is. There are a couple of things we can hit on the roadmap. How do we prioritize that? And one thing we can do is we can just come in with the roadmap, have some inductive bias, do this data analysis and go. We put three guys on this understanding, this notion thing, but just no one uses notion. That's really useful to know. Yeah, yeah, it would be useful to ask a question like how many people using my chatbot really are talking to notion docs? Oh, 7%. Yeah, we need to reprioritize our team. That's the nature of my consulting too. It's just like a lot of it is just like what should we be working on and how to allocate resources. Yep. Evals would be the same thing like just as a judge or something like that.",
+            "timestamp": 1379.408
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, I think, I mean the areas like, I think, I think from our side, the areas that the burning areas we're thinking about kind of fall into those probably the camps that Aparna's mentioned which is like the, you know, that RL loop and bringing you know, prompt based rl. People hate when I use RL because there's no gradient here. But you know, but, but it's that, that, that, that feedback loop with, with like that self driving approach for, for, for prompts to, to. To that. So that's kind of one area. And I liked your. I mean it's funny we, we have all the stuff to split out the tests and swap them out but like that's a really interesting. You know, I actually feel like that insight's a good one because people do that in our ML side. But the idea that I could, I could swap in some different prompts almost automatically test them and actually even use that to improve is even more interesting. And then there's probably an area around a part of hinted in the beginning where people are building agents and assistants which feels a little bit different than your farther afield from your retrieval stuff. But there's a lot of vertical examples there where we're trying to figure out evals for SDR assistance, evals for travel planning assistance. And is there any, you know, any, any science to those outside of just building, you know, product level evaluations? Is there, is there a way, you know, evals for the UI browser control stuff? Like there's a bunch of these verticals that we're kind of thinking a lot about and how to better understand whether the, the assistance doing what you want, converging and then how do those fit back probably into that full loop we were talking about. So Those are the biggest areas of research we probably are thinking about right.",
+            "timestamp": 1433.21
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Now just to add to that the full workflow agent. One of the things that we've been thinking about, at least for Raycast is Raycast has all these extensions. If you add three extensions it almost feels like an mcp. And one of the things we've been trying to do is just say, you know what, like before you call any functions, just list out what you think the workflow is supposed to look like. And so it tries to basically plan out everything. And then what we do is we ask the human whether or not that's like do we have an approval rating for certain workflows? And then we go back to the original thing which is okay, we have all these plans, we have the plans that are being approved and rejected. Can we again just kind of like do the data analysis to figure out like what are the 15 best like most common plans that need to exist. And then those become few shot examples. Right. And again now it's like okay, you're on Zapier. I need to send an email every time a type form comes in that needs to go into Excel. Are we able to dynamically just pull in the three workflows, three plans that generally just tell you what to do. And now that's using the system message and no matter where you are in the history, you know that those have been successful. But again it's very much this like you force the user to do some kind of data labeling. If the acceptance rate is like higher than 90%, you can make it auto accept data analysis data mining over the plans to again improve a few shots. I think we haven't gotten to the point where it's an actual RL loop that's very much just like very manual because I'm just forcing everyone to just look at logs every day.",
+            "timestamp": 1550.646
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah. Which is, which is the right thing, you know, which is a, I think a good thing to do. Like, like, I think the annotation side is what gives you the signal to even, you know, even look at in the first place. I don't know. I mean there's possibly. I mean that flow you just described is not that far from. Yeah, that like, like kid you feet like how does the full, how to do the full loop is kind of what you're, you're after to slightly more human in the middle annotation too. But that's one more signal on top of the data to be able to do stuff. So it's not that far off. It's like Yeah, I don't know how desired are you on figuring out this loop and figuring out is there's ways to automate things and maybe automate the testing too.",
+            "timestamp": 1647.268
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, I think it just depends on existing data sets and infrastructure exists.",
+            "timestamp": 1693.9
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, right.",
+            "timestamp": 1699.348
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "I think if I was to do this independently, like the bulk of the work is actually setting up the infrastructure, the test harnesses for this. And I definitely don't think any of the developers I'm hiring so far are capable of that scale of infrastructure. And it's a matter of like, how much could I do with dictation and voice coding just because again, my hands are messed up. The general experimentation, that's kind of usually where I just have a pretty good idea of like what I think needs to exist. And then I just got to sort of push that across time. I think the big challenge really is having a data set and having that test harness.",
+            "timestamp": 1700.368
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, well, I think, I mean, go ahead.",
+            "timestamp": 1735.954
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "We do have folks on our end, Jason, who could actually help with some of this. I mean, could lean in like an advisor on this area of research that we're working on and that could be, yeah, like consulting on that type. We could, we could do syncs on weekly, kind of, I don't know, progressively get some thoughts, like, get some research direction. Like that could be interesting.",
+            "timestamp": 1739.146
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, I think that could make sense permanently. Because I think if we scoped it to say like all agents that support the MCP client, then all planning needs to be accessible through the mcp, then that sort of handles a lot of the harness. Right. And then the question is, okay, when these three, like, when these three, like MCP servers are in the context, these are the kinds of plans we can produce. And now you can also reduce the search space where like, you know, I don't know if the travel booking system is like connected to like mcts or whatever, but like if we have some constraints like that around planning, then you can start thinking about these few shot examples and you go, okay, well if someone includes the gmail integration and GitHub and this coder, these are the kinds of plans that are capable of and we can do synthetic data generation. Think about that. We could figure out how to do this view shotting. We could figure out the data analysis once it's live to figure out what's the economically valuable work and include them in the few shots, that would probably tighten up the scope enough to make that quite useful. But that's also like a mcp.",
+            "timestamp": 1768.25
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Yeah. Jason, what, what do you think would be helpful here? Do you want to like come back. Maybe we could come back with some like concrete, like specific things that might be interesting because it, I think part of this was like just first getting a chance, like yeah, hear where you are, throw out a little bit of what, where our interests are. What we could do is come back with like a doc of like here's some of the areas that we're like that I think probably post this conversation is interesting to us and then like throw that over to you, Jason, and see if I feel like it would be interesting.",
+            "timestamp": 1837.63
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "That makes sense. Yeah. I think that the only constraint is like in April I will, I will be in like Europe and Asia and so there's a, there's gonna be like a time zone thing. I don't want to.",
+            "timestamp": 1867.478
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "But they set this up. Maybe we were just kind of brainstorming now prior and then you, you come back from what you're doing and there might, you might be something more here. I think the. Another thing we can do apart is I do think there's a bunch of info we have that you haven't seen, Jason. We have most of this. Most of what we're talking about is all these flows. We have a lot of stuff built and a lot of product there that can do a lot. So maybe it's talk through this, show examples of what we've done and then show you kind of like pushing a test prompt or pulling eval data. It's pretty. Running evals at scale, like having customers with lots of data where this is already happening. We have all this. And so to run these experiments would not be interfacing to our APIs. But there's a lot actually that's already exists to go do almost all that makes sense. Yeah, yeah.",
+            "timestamp": 1879.39
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Like, I'm curious what kind of like prompt templating stuff exists where like maybe like there is a prompt that you write and you know, the, the optimizer is only able to, you know, modify like the tips and the examples.",
+            "timestamp": 1941.628
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Exactly.",
+            "timestamp": 1953.34
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Examples as good and bad examples. That's kind of like the constraints you put on the system. And now you kind of know, like, well, I just have three hyperparameters and they just happen to be list of strings.",
+            "timestamp": 1954.14
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Totally. Yeah. I think that's the right way to look at it. Like add instructions to the overall thing and those instructions can be examples, can be, you know, fixes. But.",
+            "timestamp": 1963.46
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, yep, exactly. Exactly. I think there's a lot of people.",
+            "timestamp": 1972.612
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Oh no, I was going to say Jason probably also just stuff related to him. I did a pass of basically Just, like, trying, you know, part of this is also, like, you know, I'd love for you to also build a little bit of, like, connection to, like, what we build. And so we're happy to also have you, like, try Phoenix or try Rise in the process. And Mel did that a bit, and I think he ended up walking away loving. I think he's using Phoenix in this course right now. And so, like, there's probably also something here of, like, we could also just. I love feedback on the product, and so getting your takes on the product would also probably be helpful.",
+            "timestamp": 1978.74
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah, I think part of the independent research is sort of be be able to come up with these, like, toy examples and, like, force people on Twitter to use them to, like, start collecting data. And so, yeah, I think those definitely make sense to try a bunch of these tools on my own terms, I think. I think just companies are usually pretty opinionated with what they use, but.",
+            "timestamp": 2015.488
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, yeah, yeah, absolutely.",
+            "timestamp": 2032.104
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Yeah.",
+            "timestamp": 2033.632
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Okay, well, let me circle back with Jason. I can't even say Jason. L. Because you're both Jason. Let me circle back, put together, like, a list of what we think could. We could kick off here, and then let me throw that back to you, Jason, if that works.",
+            "timestamp": 2035.08
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Perfect. Sounds good. Great.",
+            "timestamp": 2055.739
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Awesome. Okay. Great meeting you, dude. Again.",
+            "timestamp": 2057.411
+        },
+        {
+            "speaker": "Jason Liu",
+            "text": "Awesome. By the way.",
+            "timestamp": 2060.227
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "I'm actually East coast, but I'm coming back to the Bay Area in May, so I, I, I go east and west coast throughout the year.",
+            "timestamp": 2064.259
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Yeah, I, I'm on the west coast myself.",
+            "timestamp": 2072.739
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Awesome.",
+            "timestamp": 2078.26
+        },
+        {
+            "speaker": "Jason Lopatecki",
+            "text": "Okay, bye.",
+            "timestamp": 2078.732
+        },
+        {
+            "speaker": "Aparna Dhinakaran",
+            "text": "Bye. See you.",
+            "timestamp": 2080.092
+        }
+    ]
+}
