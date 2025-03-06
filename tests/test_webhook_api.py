@@ -1,11 +1,7 @@
 """
 Tests for webhook API endpoints.
 """
-import json
-import pytest
-from fastapi import status, BackgroundTasks
-from fastapi.testclient import TestClient
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi import status
 
 from app.services import meeting_service
 

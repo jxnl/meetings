@@ -3,9 +3,7 @@ Test script to send a webhook payload to the API.
 """
 
 import json
-import requests
 import sys
-import random
 from datetime import datetime
 
 # Webhook endpoint URL

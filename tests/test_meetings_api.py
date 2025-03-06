@@ -3,7 +3,6 @@ Tests for meetings API endpoints.
 """
 import pytest
 from fastapi import status
-from bs4 import BeautifulSoup
 
 from app.models.meeting import ActionItem
 

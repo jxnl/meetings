@@ -2,7 +2,6 @@
 Application configuration settings loaded from environment variables.
 """
 
-import os
 from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict

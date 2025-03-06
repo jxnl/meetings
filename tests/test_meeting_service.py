@@ -1,8 +1,6 @@
 """
 Tests for meeting service functions.
 """
-import pytest
-from datetime import datetime
 
 from app.services import meeting_service
 from app.schemas.meeting import WebhookPayload, DenormalizedMeeting
@@ -101,7 +99,7 @@ def test_denormalized_meeting_view(db_session, db_meeting):
     assert denorm_meeting.attendee_count() == 2
     assert denorm_meeting.transcript_length() == 2
     assert denorm_meeting.transcript_word_count() > 0
-    assert denorm_meeting.has_recording() == True
+    assert denorm_meeting.has_recording() is True
     
     # Test YAML formatting
     yaml_dict = denorm_meeting.simplified_for_yaml

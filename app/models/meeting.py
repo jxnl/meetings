@@ -2,8 +2,6 @@
 Database model for Meeting data.
 """
 
-from datetime import datetime
-from typing import List
 
 from sqlalchemy import (
     Column,
@@ -11,7 +9,6 @@ from sqlalchemy import (
     String,
     Float,
     DateTime,
-    Boolean,
     Text,
     ForeignKey,
     JSON,

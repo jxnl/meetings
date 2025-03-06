@@ -2,19 +2,16 @@
 Shared test fixtures for the meetings app.
 """
 
-import asyncio
 import pytest
-from datetime import datetime, timedelta
-from fastapi import FastAPI
+from datetime import datetime
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.db.base_class import Base
 from app.db.session import get_db
-from app.models.meeting import Meeting, Attendee, ActionItem, TranscriptEntry, DenormalizedMeetingView
-from app.schemas.meeting import WebhookPayload, AttendeeCreate, ActionItemCreate, TranscriptEntryCreate
+from app.models.meeting import Meeting, Attendee, ActionItem, TranscriptEntry
 from app.core.app import create_app
 
 

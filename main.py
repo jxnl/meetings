@@ -2,7 +2,6 @@
 Main entry point for the FastAPI application.
 """
 
-import os
 import uvicorn
 from app.core.app import create_app
 from dotenv import load_dotenv

@@ -3,10 +3,8 @@ Service for handling meeting data operations.
 """
 
 from datetime import datetime, timedelta
-import json
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any
 
-from sqlalchemy import func, case, and_
 from sqlalchemy.orm import Session
 
 from app.core.logging import trace
@@ -18,7 +16,6 @@ from app.models.meeting import (
     DenormalizedMeetingView,
 )
 from app.schemas.meeting import (
-    MeetingCreate,
     WebhookPayload,
     DenormalizedMeeting,
     DenormalizedAttendee,

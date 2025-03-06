@@ -5,7 +5,7 @@ Pydantic schemas for meeting data validation and serialization.
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 
-from pydantic import BaseModel, Field, EmailStr, root_validator
+from pydantic import BaseModel, Field
 
 
 class AttendeeBase(BaseModel):
