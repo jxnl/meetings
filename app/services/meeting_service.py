@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any
 
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from app.core.logging import trace
 from app.models.meeting import (
@@ -130,6 +131,14 @@ def get_meeting(db: Session, meeting_id: int) -> Optional[Meeting]:
     return db.query(Meeting).filter(Meeting.id == meeting_id).first()
 
 
+@trace(name="get_meeting_by_ids")
+def get_meeting_by_ids(db: Session, meeting_ids: List[int]) -> List[Meeting]:
+    """
+    Get a list of meetings by their IDs.
+    """
+    return db.query(Meeting).filter(Meeting.id.in_(meeting_ids)).all()
+
+
 @trace(name="list_meetings", tracked_args=["skip", "limit"])
 def get_meetings(db: Session, skip: int = 0, limit: int = 100) -> List[Meeting]:
     """
@@ -230,7 +239,17 @@ def get_attendees_with_valid_emails(db: Session) -> List[Attendee]:
         List[Attendee]: List of attendee objects with email addresses
     """
     # Get all attendees with valid email addresses
-    attendees = db.query(Attendee).filter(Attendee.email.isnot(None)).all()
+    # Use joinedload to load the meetings relationship in a single query
+    # This prevents the N+1 query problem when accessing attendee.meetings later
+    attendees = (
+        db.query(Attendee)
+        .options(joinedload(Attendee.meetings))
+        .filter(Attendee.email.isnot(None))
+        .all()
+    )
+
+    # Convert to list to ensure all data is loaded before returning
+    # (though this is redundant with .all() in SQLAlchemy's synchronous API)
     return attendees
 
 

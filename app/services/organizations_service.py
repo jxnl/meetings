@@ -1,8 +1,12 @@
 from collections import defaultdict
 from typing import List
 
+from app.core.logging import trace
 from app.models.meeting import Attendee
-from app.services.meeting_service import get_attendees_with_valid_emails, get_meeting
+from app.services.meeting_service import (
+    get_attendees_with_valid_emails,
+    get_meeting_by_ids,
+)
 
 # List of generic email domains to exclude
 GENERIC_DOMAINS = {
@@ -24,13 +28,20 @@ GENERIC_DOMAINS = {
 }
 
 
+@trace(name="get_attendee_by_id")
 def _get_attendee_by_id(db, attendee_id: int) -> Attendee:
     return db.query(Attendee).filter(Attendee.id == attendee_id).first()
 
 
+@trace(name="get_attendee_by_ids")
+def _get_attendee_by_ids(db, attendee_ids: List[int]) -> List[Attendee]:
+    return db.query(Attendee).filter(Attendee.id.in_(attendee_ids)).all()
+
+
 def get_organizations(db) -> List[dict]:
-    attendees = get_attendees_with_valid_emails(db)
     organizations = defaultdict(list)
+
+    attendees = get_attendees_with_valid_emails(db)
 
     for attendee in attendees:
         if attendee.email is None:
@@ -55,15 +66,33 @@ def get_organizations(db) -> List[dict]:
         meeting_notes = []
         meeting_ids = set()
 
+        # Get attendee objects by ID
+        attendee_objs_by_id = {
+            attendee.id: attendee
+            for attendee in _get_attendee_by_ids(
+                db, [member["id"] for member in members]
+            )
+        }
+
         for member in members:
-            attendee_obj = _get_attendee_by_id(db, member["id"])
+            attendee_obj = attendee_objs_by_id.get(member["id"])
             if not attendee_obj:
                 continue
             for meeting in attendee_obj.meetings:
                 meeting_ids.add(meeting.id)
 
+        # Get all meetings for this organization in a single query (more efficient than fetching individually)
+        meetings_by_id = (
+            {
+                meeting.id: meeting
+                for meeting in get_meeting_by_ids(db, list(meeting_ids))
+            }
+            if meeting_ids
+            else {}
+        )
+
         for meeting_id in meeting_ids:
-            meeting = get_meeting(db, meeting_id)
+            meeting = meetings_by_id.get(meeting_id)
             if not meeting:
                 continue
             for item in meeting.action_items:
