@@ -313,98 +313,112 @@ async def list_organizations(request: Request, db: Session = Depends(get_db)):
         HTMLResponse: Rendered template with organizations and their data
     """
     attendees = get_attendees_with_valid_emails(db)
-    
+
     # Group attendees by domain with special handling for generic domains
     organizations = defaultdict(list)
-    
+
     for attendee in attendees:
         if not attendee.email:
             continue
-            
+
         # Extract domain from email
         email_parts = attendee.email.split("@")
         if len(email_parts) != 2:
             continue
-            
+
         domain = email_parts[1].lower()
-        
+
         # For generic domains, use the full email as the "domain"
         if domain in GENERIC_DOMAINS:
-            domain_key = attendee.email.lower()  # Treat each person as their own "organization"
+            domain_key = (
+                attendee.email.lower()
+            )  # Treat each person as their own "organization"
         else:
             domain_key = domain
-            
+
         # Add attendee to organization group
-        organizations[domain_key].append({
-            "id": attendee.id,
-            "name": attendee.name,
-            "email": attendee.email,
-            "is_generic": domain in GENERIC_DOMAINS,
-        })
-    
+        organizations[domain_key].append(
+            {
+                "id": attendee.id,
+                "name": attendee.name,
+                "email": attendee.email,
+                "is_generic": domain in GENERIC_DOMAINS,
+            }
+        )
+
     # Process each organization
     org_data = []
-    
+
     for domain, members in organizations.items():
         # Find all unfinished action items for this organization
         action_items = []
         meeting_notes = []
         meeting_ids = set()
-        
+
         for member in members:
             attendee = db.query(Attendee).filter(Attendee.id == member["id"]).first()
             if not attendee:
                 continue
-                
+
             # Get all meetings for this attendee
             for meeting in attendee.meetings:
                 meeting_ids.add(meeting.id)
-        
+
         # Get unfinished action items for all meetings in this organization
         for meeting_id in meeting_ids:
             meeting = get_meeting(db, meeting_id)
             if not meeting:
                 continue
-                
+
             # Get unfinished action items
             for item in meeting.action_items:
                 if item.status.upper() != "COMPLETED":
-                    action_items.append({
-                        "id": item.id,
-                        "title": item.title,
-                        "description": item.description,
-                        "status": item.status,
-                        "assignee_name": item.assignee_name,
-                        "assignee_email": item.assignee_email,
-                        "meeting_id": meeting_id,
-                        "meeting_name": meeting.name,
-                    })
-            
+                    action_items.append(
+                        {
+                            "id": item.id,
+                            "title": item.title,
+                            "description": item.description,
+                            "status": item.status,
+                            "assignee_name": item.assignee_name,
+                            "assignee_email": item.assignee_email,
+                            "meeting_id": meeting_id,
+                            "meeting_name": meeting.name,
+                        }
+                    )
+
             # Add meeting notes if they exist
             if meeting.notes:
-                meeting_notes.append({
-                    "meeting_id": meeting.id,
-                    "meeting_name": meeting.name,
-                    "created_at": meeting.created_at,
-                    "notes": meeting.notes,
-                })
-        
+                meeting_notes.append(
+                    {
+                        "meeting_id": meeting.id,
+                        "meeting_name": meeting.name,
+                        "created_at": meeting.created_at,
+                        "notes": meeting.notes,
+                    }
+                )
+
         # Add to the organization data
-        org_data.append({
-            "domain": domain,
-            "display_name": domain if not members[0]["is_generic"] else members[0]["name"],
-            "is_generic": members[0]["is_generic"],
-            "members": sorted(members, key=lambda x: x["name"]),
-            "member_count": len(members),
-            "action_items": sorted(action_items, key=lambda x: x["status"]),
-            "action_items_count": len(action_items),
-            "meeting_notes": sorted(meeting_notes, key=lambda x: x["created_at"], reverse=True),
-            "meeting_ids": list(meeting_ids),
-        })
-    
+        org_data.append(
+            {
+                "domain": domain,
+                "display_name": (
+                    domain if not members[0]["is_generic"] else members[0]["name"]
+                ),
+                "is_generic": members[0]["is_generic"],
+                "members": sorted(members, key=lambda x: x["name"]),
+                "member_count": len(members),
+                "action_items": sorted(action_items, key=lambda x: x["status"]),
+                "action_items_count": len(action_items),
+                "meeting_notes": sorted(
+                    meeting_notes, key=lambda x: x["created_at"], reverse=True
+                ),
+                "meeting_ids": list(meeting_ids),
+            }
+        )
+
     # Sort organizations by member count (descending)
     org_data.sort(key=lambda x: x["member_count"], reverse=True)
-    
+
     return templates.TemplateResponse(
         "meetings/organizations.html",
         {
@@ -419,29 +433,27 @@ async def list_organizations(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/action-items/{action_item_id}/update", response_class=JSONResponse)
 async def update_action_item(
-    action_item_id: int, 
-    status: str = Form(...),
-    db: Session = Depends(get_db)
+    action_item_id: int, status: str = Form(...), db: Session = Depends(get_db)
 ):
     """
     Update the status of an action item.
-    
+
     Args:
         action_item_id: ID of the action item to update
         status: New status for the action item
         db: Database session
-        
+
     Returns:
         JSONResponse: Status of the update operation
     """
     success = update_action_item_status(db, action_item_id, status.upper())
-    
+
     if not success:
         return JSONResponse(
             status_code=404,
-            content={"success": False, "message": "Action item not found"}
+            content={"success": False, "message": "Action item not found"},
         )
-        
+
     return JSONResponse(
         content={"success": True, "message": "Action item updated successfully"}
     )

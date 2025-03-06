@@ -34,11 +34,11 @@ def db_session(db_engine):
     connection = db_engine.connect()
     # Begin a non-ORM transaction
     transaction = connection.begin()
-    
+
     # Bind a session to the connection
     Session = sessionmaker(autocommit=False, autoflush=False, bind=connection)
     session = Session()
-    
+
     try:
         yield session
     finally:
@@ -52,14 +52,14 @@ def db_session(db_engine):
 def app(db_session):
     """Create a FastAPI app for testing."""
     app = create_app()
-    
+
     # Override the get_db dependency
     async def override_get_db():
         try:
             yield db_session
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     return app
 
@@ -113,13 +113,14 @@ def sample_meeting_data():
 @pytest.fixture(scope="function")
 def background_tasks_mock():
     """Create a mock for background tasks."""
+
     class BackgroundTasksMock:
         def __init__(self):
             self.tasks = []
-        
+
         def add_task(self, func, *args, **kwargs):
             self.tasks.append((func, args, kwargs))
-            
+
     return BackgroundTasksMock()
 
 
@@ -138,17 +139,17 @@ def db_meeting(db_session):
         received_at=datetime.now(),
     )
     db_session.add(meeting)
-    
+
     # Create attendees
     attendee1 = Attendee(name="John Doe", email="john@example.com")
     attendee2 = Attendee(name="Jane Smith", email="jane@example.com")
     db_session.add_all([attendee1, attendee2])
     db_session.flush()
-    
+
     # Associate attendees with meeting
     meeting.attendees.append(attendee1)
     meeting.attendees.append(attendee2)
-    
+
     # Add action items
     action_item = ActionItem(
         title="Test Action Item",
@@ -159,7 +160,7 @@ def db_meeting(db_session):
         meeting_id=meeting.id,
     )
     db_session.add(action_item)
-    
+
     # Add transcript entries
     transcript_entry1 = TranscriptEntry(
         speaker="John Doe",
@@ -174,9 +175,9 @@ def db_meeting(db_session):
         meeting_id=meeting.id,
     )
     db_session.add_all([transcript_entry1, transcript_entry2])
-    
+
     # Commit
     db_session.commit()
     db_session.refresh(meeting)
-    
+
     return meeting

@@ -2,7 +2,6 @@
 Database model for Meeting data.
 """
 
-
 from sqlalchemy import (
     Column,
     Integer,
