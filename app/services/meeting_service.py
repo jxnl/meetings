@@ -581,6 +581,32 @@ def get_analytics_data(
     }
 
 
+def update_action_item_status(db: Session, action_item_id: int, new_status: str) -> bool:
+    """
+    Update the status of an action item.
+    
+    Args:
+        db: Database session
+        action_item_id: ID of the action item to update
+        new_status: New status for the action item (e.g., "COMPLETED", "PENDING")
+        
+    Returns:
+        bool: True if successfully updated, False otherwise
+    """
+    action_item = db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
+    if not action_item:
+        return False
+        
+    action_item.status = new_status
+    db.commit()
+    
+    # Update the denormalized view to reflect the change
+    meeting_id = action_item.meeting_id
+    update_denormalized_meeting_view(db, meeting_id)
+    
+    return True
+
+
 def get_user_analytics(db: Session, email: str) -> Dict[str, Any]:
     """
     Get analytics data for a specific user by email.

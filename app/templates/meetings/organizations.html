@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/yaml.min.js"></script>
+    <style>
+        .org-card {
+            margin-bottom: 2rem;
+            transition: all 0.2s ease;
+        }
+        .org-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .action-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        .action-item:hover {
+            background-color: #f8f9fa;
+        }
+        .action-item:last-child {
+            border-bottom: none;
+        }
+        .action-item.completed {
+            background-color: #f0fff0;
+            text-decoration: line-through;
+        }
+        .notes-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .notes-content {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            border-left: 3px solid #dee2e6;
+            margin-bottom: 1rem;
+        }
+        .yaml-btn {
+            cursor: pointer;
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #0c63e4;
+        }
+        .member-badge {
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .assignee-badge {
+            font-size: 0.8rem;
+            background-color: #e7f5ff;
+            color: #004085;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+        }
+        .meeting-badge {
+            font-size: 0.8rem;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="sticky-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <h1 class="me-3">Organizations</h1>
+                    <a href="/meetings/" class="btn btn-outline-primary me-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-week me-1" viewBox="0 0 16 16">
+                            <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z"/>
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                        </svg>
+                        Meetings
+                    </a>
+                    <a href="/meetings/domains" class="btn btn-outline-info me-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building me-1" viewBox="0 0 16 16">
+                            <path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3V2zm12 0H9v12h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2"></path>
+                        </svg>
+                        Domains
+                    </a>
+                    <a href="/meetings/analytics" class="btn btn-outline-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-fill me-1" viewBox="0 0 16 16">
+                            <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+                        </svg>
+                        Analytics
+                    </a>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Organizations:</strong> {{ total_organizations }} found with {{ total_action_items }} pending action items
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for org in organizations %}
+            <div class="col-12 mb-4">
+                <div class="card org-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3>
+                            {% if org.is_generic %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-circle me-2" viewBox="0 0 16 16">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                            </svg>
+                            {% else %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-building me-2" viewBox="0 0 16 16">
+                                <path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                                <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3V2zm12 0H9v12h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2"></path>
+                            </svg>
+                            {% endif %}
+                            {{ org.display_name }}
+                            <span class="badge bg-primary ms-2">{{ org.member_count }} member{% if org.member_count != 1 %}s{% endif %}</span>
+                        </h3>
+                        <button class="btn btn-outline-primary copy-yaml-btn" data-meeting-ids='{{ org.meeting_ids|tojson }}'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard me-1" viewBox="0 0 16 16">
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                            </svg>
+                            Copy YAML
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="org{{ loop.index }}Accordion">
+                            <!-- Members Section -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="membersHeading{{ loop.index }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#membersCollapse{{ loop.index }}" aria-expanded="false" aria-controls="membersCollapse{{ loop.index }}">
+                                        Members ({{ org.member_count }})
+                                    </button>
+                                </h2>
+                                <div id="membersCollapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="membersHeading{{ loop.index }}" data-bs-parent="#org{{ loop.index }}Accordion">
+                                    <div class="accordion-body">
+                                        <div class="d-flex flex-wrap">
+                                            {% for member in org.members %}
+                                            <span class="badge bg-light text-dark border member-badge">
+                                                <span class="me-1">{{ member.name }}</span>
+                                                {% if member.email %}
+                                                <small class="text-muted">({{ member.email }})</small>
+                                                {% endif %}
+                                            </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Items Section -->
+                            {% if org.action_items %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="actionItemsHeading{{ loop.index }}">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#actionItemsCollapse{{ loop.index }}" aria-expanded="true" aria-controls="actionItemsCollapse{{ loop.index }}">
+                                        Action Items ({{ org.action_items|length }})
+                                    </button>
+                                </h2>
+                                <div id="actionItemsCollapse{{ loop.index }}" class="accordion-collapse collapse show" aria-labelledby="actionItemsHeading{{ loop.index }}" data-bs-parent="#org{{ loop.index }}Accordion">
+                                    <div class="accordion-body p-0">
+                                        <div class="list-group list-group-flush">
+                                            {% for item in org.action_items %}
+                                            <div class="action-item" data-item-id="{{ item.id }}">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="form-check me-3 mt-1">
+                                                        <input class="form-check-input action-checkbox" type="checkbox" value="" id="actionItem{{ item.id }}" data-item-id="{{ item.id }}" {% if item.status.upper() == "COMPLETED" %}checked{% endif %}>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="d-flex justify-content-between">
+                                                            <h5 class="mb-1">{{ item.title }}</h5>
+                                                            <small class="text-muted meeting-badge">
+                                                                {{ item.meeting_name }}
+                                                            </small>
+                                                        </div>
+                                                        {% if item.description %}
+                                                        <p class="mb-1">{{ item.description }}</p>
+                                                        {% endif %}
+                                                        {% if item.assignee_name %}
+                                                        <small class="assignee-badge">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-person me-1" viewBox="0 0 16 16">
+                                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z"/>
+                                                            </svg>
+                                                            {{ item.assignee_name }}
+                                                        </small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Meeting Notes Section -->
+                            {% if org.meeting_notes %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="notesHeading{{ loop.index }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#notesCollapse{{ loop.index }}" aria-expanded="false" aria-controls="notesCollapse{{ loop.index }}">
+                                        Meeting Notes ({{ org.meeting_notes|length }})
+                                    </button>
+                                </h2>
+                                <div id="notesCollapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="notesHeading{{ loop.index }}" data-bs-parent="#org{{ loop.index }}Accordion">
+                                    <div class="accordion-body">
+                                        <div class="notes-container">
+                                            {% for note in org.meeting_notes %}
+                                            <div class="mb-4">
+                                                <h5>{{ note.meeting_name }}</h5>
+                                                <p class="text-muted small">{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                                                <div class="notes-content">
+                                                    {{ note.notes|safe }}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    No organizations found. This may occur if there are no meeting attendees with valid email addresses.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Hidden YAML container for copy operation -->
+        <div id="yamlContainer" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up action item checkbox functionality
+            const actionCheckboxes = document.querySelectorAll('.action-checkbox');
+            
+            actionCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const itemId = this.dataset.itemId;
+                    const parent = document.querySelector(`.action-item[data-item-id="${itemId}"]`);
+                    const newStatus = this.checked ? 'COMPLETED' : 'PENDING';
+                    
+                    // Toggle completed class
+                    if (this.checked) {
+                        parent.classList.add('completed');
+                    } else {
+                        parent.classList.remove('completed');
+                    }
+                    
+                    // Send update to server
+                    const formData = new FormData();
+                    formData.append('status', newStatus);
+                    
+                    fetch(`/meetings/action-items/${itemId}/update`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            console.error('Error updating action item:', data.message);
+                            // Revert checkbox if update failed
+                            this.checked = !this.checked;
+                            if (this.checked) {
+                                parent.classList.add('completed');
+                            } else {
+                                parent.classList.remove('completed');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Revert checkbox on error
+                        this.checked = !this.checked;
+                        if (this.checked) {
+                            parent.classList.add('completed');
+                        } else {
+                            parent.classList.remove('completed');
+                        }
+                    });
+                });
+            });
+            
+            // Set up Copy YAML functionality
+            const copyYamlButtons = document.querySelectorAll('.copy-yaml-btn');
+            const yamlContainer = document.getElementById('yamlContainer');
+            
+            copyYamlButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const meetingIds = JSON.parse(this.dataset.meetingIds);
+                    if (meetingIds.length === 0) {
+                        alert('No meetings found for this organization.');
+                        return;
+                    }
+                    
+                    // Create form data with meeting IDs
+                    const formData = new FormData();
+                    meetingIds.forEach(id => {
+                        formData.append('meeting_ids', id);
+                    });
+                    
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...`;
+                    this.disabled = true;
+                    
+                    // Generate YAML
+                    fetch('/meetings/generate-yaml', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        // Extract YAML content from the response
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const yamlContentElement = doc.querySelector('#yamlContent');
+                        
+                        if (yamlContentElement) {
+                            const yamlText = yamlContentElement.textContent;
+                            
+                            // Copy to clipboard
+                            navigator.clipboard.writeText(yamlText)
+                                .then(() => {
+                                    // Show success state
+                                    this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                    </svg> Copied!`;
+                                    
+                                    // Reset after delay
+                                    setTimeout(() => {
+                                        this.innerHTML = originalText;
+                                        this.disabled = false;
+                                    }, 2000);
+                                })
+                                .catch(err => {
+                                    console.error('Failed to copy YAML: ', err);
+                                    alert('Failed to copy YAML to clipboard.');
+                                    this.innerHTML = originalText;
+                                    this.disabled = false;
+                                });
+                        } else {
+                            console.error('YAML content not found in response');
+                            alert('Error: Failed to generate YAML content.');
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error generating YAML:', error);
+                        alert('Error: Failed to generate YAML content.');
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    });
+                });
+            });
+            
+            // Mark completed items on load
+            document.querySelectorAll('.action-checkbox:checked').forEach(checkbox => {
+                const itemId = checkbox.dataset.itemId;
+                const parent = document.querySelector(`.action-item[data-item-id="${itemId}"]`);
+                parent.classList.add('completed');
+            });
+        });
+    </script>
+</body>
+</html>
