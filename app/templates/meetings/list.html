@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetings List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .meeting-card {
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        .meeting-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .meeting-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .yaml-container {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .attendee-list {
+            margin-top: 0.5rem;
+        }
+        .attendee-item {
+            padding: 0.25rem 0;
+        }
+        .meeting-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .attendees-section {
+            border-top: 1px solid #eee;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="sticky-header mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Meetings</h1>
+                <div>
+                    <button id="selectAllBtn" class="btn btn-outline-primary me-2">Select All</button>
+                    <button id="deselectAllBtn" class="btn btn-outline-secondary me-2">Deselect All</button>
+                    <button id="generateYamlBtn" class="btn btn-primary">Generate Meeting Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <form id="meetingsForm" method="post" action="/meetings/generate-yaml">
+            <div class="row">
+                {% for meeting in meetings %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card meeting-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input meeting-checkbox" type="checkbox" name="meeting_ids" value="{{ meeting.id }}" id="meeting{{ meeting.id }}">
+                                <label class="form-check-label" for="meeting{{ meeting.id }}">
+                                    Select
+                                </label>
+                            </div>
+                            <span class="badge bg-primary">ID: {{ meeting.id }}</span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ meeting.name }}</h5>
+                            <p class="card-text meeting-date">
+                                {{ meeting.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </p>
+                            
+                            <div class="attendees-section">
+                                <strong>Attendees:</strong>
+                                {% if meeting.attendees %}
+                                <ul class="list-unstyled attendee-list">
+                                    {% for attendee in meeting.attendees %}
+                                    <li class="attendee-item">{{ attendee.name }}{% if attendee.email %} <span class="text-muted">({{ attendee.email }})</span>{% endif %}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p class="text-muted mt-2">No attendees recorded</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+
+        <div id="yamlResult" class="mt-4 hidden">
+            <h3>Generated YAML</h3>
+            <div class="d-flex justify-content-end mb-2">
+                <button id="copyYamlBtn" class="btn btn-sm btn-outline-secondary">Copy to Clipboard</button>
+            </div>
+            <div id="yamlContent" class="yaml-container"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('meetingsForm');
+            const generateBtn = document.getElementById('generateYamlBtn');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const deselectAllBtn = document.getElementById('deselectAllBtn');
+            const yamlResult = document.getElementById('yamlResult');
+            const yamlContent = document.getElementById('yamlContent');
+            const copyYamlBtn = document.getElementById('copyYamlBtn');
+            const checkboxes = document.querySelectorAll('.meeting-checkbox');
+
+            // Select/Deselect All functionality
+            selectAllBtn.addEventListener('click', function() {
+                checkboxes.forEach(checkbox => checkbox.checked = true);
+            });
+
+            deselectAllBtn.addEventListener('click', function() {
+                checkboxes.forEach(checkbox => checkbox.checked = false);
+            });
+
+            // Generate YAML
+            generateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const selectedMeetings = Array.from(checkboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                
+                if (selectedMeetings.length === 0) {
+                    alert('Please select at least one meeting.');
+                    return;
+                }
+                
+                const formData = new FormData();
+                selectedMeetings.forEach(id => {
+                    formData.append('meeting_ids', id);
+                });
+                
+                fetch('/meetings/generate-yaml', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Extract YAML content from the response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const yamlText = doc.getElementById('yamlContent').textContent;
+                    
+                    // Display the YAML
+                    yamlContent.textContent = yamlText;
+                    yamlResult.classList.remove('hidden');
+                    
+                    // Scroll to the result
+                    yamlResult.scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while generating YAML.');
+                });
+            });
+            
+            // Copy to clipboard functionality
+            copyYamlBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(yamlContent.textContent)
+                    .then(() => {
+                        const originalText = copyYamlBtn.textContent;
+                        copyYamlBtn.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyYamlBtn.textContent = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        alert('Failed to copy to clipboard');
+                    });
+            });
+        });
+    </script>
+</body>
+</html> 
