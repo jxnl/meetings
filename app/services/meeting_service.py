@@ -9,6 +9,7 @@ from typing import List, Optional, Dict, Any, Tuple
 from sqlalchemy import func, case, and_
 from sqlalchemy.orm import Session
 
+from app.core.logging import trace
 from app.models.meeting import (
     Meeting,
     Attendee,
@@ -26,6 +27,7 @@ from app.schemas.meeting import (
 )
 
 
+@trace(name="create_meeting_webhook", tracked_args=["payload.name", "payload.id"])
 def create_meeting_from_webhook(db: Session, payload: WebhookPayload) -> Meeting:
     """
     Create a meeting record from a webhook payload.
@@ -116,6 +118,7 @@ def create_meeting_from_webhook(db: Session, payload: WebhookPayload) -> Meeting
     return db_meeting
 
 
+@trace(name="get_meeting_by_id")
 def get_meeting(db: Session, meeting_id: int) -> Optional[Meeting]:
     """
     Get a meeting by ID.
@@ -130,6 +133,7 @@ def get_meeting(db: Session, meeting_id: int) -> Optional[Meeting]:
     return db.query(Meeting).filter(Meeting.id == meeting_id).first()
 
 
+@trace(name="list_meetings", tracked_args=["skip", "limit"])
 def get_meetings(db: Session, skip: int = 0, limit: int = 100) -> List[Meeting]:
     """
     Get a list of meetings.
@@ -151,6 +155,7 @@ def get_meetings(db: Session, skip: int = 0, limit: int = 100) -> List[Meeting]:
     )
 
 
+@trace(name="get_meeting_external", tracked_args=["external_id"])
 def get_meeting_by_external_id(db: Session, external_id: int) -> Optional[Meeting]:
     """
     Get a meeting by its external ID.
@@ -165,6 +170,7 @@ def get_meeting_by_external_id(db: Session, external_id: int) -> Optional[Meetin
     return db.query(Meeting).filter(Meeting.external_id == external_id).first()
 
 
+@trace(name="delete_meeting", tracked_args=["meeting_id"])
 def delete_meeting(db: Session, meeting_id: int) -> bool:
     """
     Delete a meeting by ID.
@@ -184,6 +190,7 @@ def delete_meeting(db: Session, meeting_id: int) -> bool:
     return False
 
 
+@trace(name="get_attendee", tracked_args=["email"])
 def get_attendee_by_email(db: Session, email: str) -> Optional[Attendee]:
     """
     Get an attendee by email.
@@ -198,6 +205,7 @@ def get_attendee_by_email(db: Session, email: str) -> Optional[Attendee]:
     return db.query(Attendee).filter(Attendee.email == email).first()
 
 
+@trace(name="list_attendees", tracked_args=["skip", "limit"])
 def get_attendees(db: Session, skip: int = 0, limit: int = 100) -> List[Attendee]:
     """
     Get a list of unique attendees.
@@ -213,6 +221,7 @@ def get_attendees(db: Session, skip: int = 0, limit: int = 100) -> List[Attendee
     return db.query(Attendee).offset(skip).limit(limit).all()
 
 
+@trace(name="get_attendees_with_emails")
 def get_attendees_with_valid_emails(db: Session) -> List[Attendee]:
     """
     Get a list of unique attendees who have email addresses.
@@ -228,6 +237,7 @@ def get_attendees_with_valid_emails(db: Session) -> List[Attendee]:
     return attendees
 
 
+@trace(name="get_attendee_stats", tracked_args=["attendee_id"])
 def get_attendee_stats(db: Session, attendee_id: int) -> Dict[str, Any]:
     """
     Get statistics for a specific attendee.
@@ -288,6 +298,7 @@ def format_timestamp(seconds: float) -> str:
         return f"{minutes:02d}:{secs:02d}"
 
 
+@trace(name="update_denormalized_view", tracked_args=["meeting_id"])
 def update_denormalized_meeting_view(db: Session, meeting_id: int) -> None:
     """
     Update the denormalized meeting view for a given meeting.
@@ -377,6 +388,7 @@ def update_denormalized_meeting_view(db: Session, meeting_id: int) -> None:
     db.commit()
 
 
+@trace(name="get_denormalized_meeting", tracked_args=["meeting_id"])
 def get_denormalized_meeting(
     db: Session, meeting_id: int
 ) -> Optional[DenormalizedMeeting]:
@@ -444,6 +456,7 @@ def get_denormalized_meeting(
     )
 
 
+@trace(name="get_analytics", tracked_args=["time_period"])
 def get_analytics_data(
     db: Session, time_period: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -581,32 +594,36 @@ def get_analytics_data(
     }
 
 
-def update_action_item_status(db: Session, action_item_id: int, new_status: str) -> bool:
+@trace(name="update_action_item", tracked_args=["action_item_id", "new_status"])
+def update_action_item_status(
+    db: Session, action_item_id: int, new_status: str
+) -> bool:
     """
     Update the status of an action item.
-    
+
     Args:
         db: Database session
         action_item_id: ID of the action item to update
         new_status: New status for the action item (e.g., "COMPLETED", "PENDING")
-        
+
     Returns:
         bool: True if successfully updated, False otherwise
     """
     action_item = db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
     if not action_item:
         return False
-        
+
     action_item.status = new_status
     db.commit()
-    
+
     # Update the denormalized view to reflect the change
     meeting_id = action_item.meeting_id
     update_denormalized_meeting_view(db, meeting_id)
-    
+
     return True
 
 
+@trace(name="get_user_analytics", tracked_args=["email"])
 def get_user_analytics(db: Session, email: str) -> Dict[str, Any]:
     """
     Get analytics data for a specific user by email.
